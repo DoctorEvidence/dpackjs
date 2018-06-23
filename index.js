@@ -18,15 +18,12 @@ object-own-structure: 0xc1 object-token(length of structure), structure, ...valu
 
 
 const msgpack = require('msgpack-lite')
-const Document = require('./lib/Document')
-const documentPacker = require('write-doc').documentPacker
-const documentUnpackerLazy = require('read-doc').documentUnpackerLazy
+const documentPacker = require('./lib/write-doc').documentPacker
+const documentUnpackerLazy = require('./lib/read-doc').documentUnpackerLazy
+const EncodeStream = require('./lib/encode-stream').EncodeStream
 
-exports.makeDocument = (object, Type) => {
-	// TODO: Create a proxy here, but in the meantime just mark it
-	Object.defineProperty(object, 'constructor', { value: Document, configurable: true })
-	return object
-}
+const Document = exports.Document = require('./lib/Document').Document
+exports.makeDocument = require('./lib/Document').makeDocument
 
 
 function ObjectReference() {}
@@ -71,3 +68,6 @@ exports.decode = (value, options) => {
 	return msgpack.decode(value, options)
 }
 
+exports.createEncodeStream = function() {
+
+}
