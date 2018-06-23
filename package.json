@@ -1,12 +1,12 @@
 {
-  "name": "msgpack-doc",
+  "name": "doc-pack",
   "author": "Kris Zyp",
   "version": "0.0.1",
   "description": "MessagePack codec/extension for documents, an object or array that contains reusable structures/templates for more efficient, compact, faster encodings, and for lazy parsing",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "http://github.com/kriszyp/msgpack-doc"
+    "url": "http://github.com/DoctorEvidence/doc-pack"
   },
   "scripts": {
     "test": "./node_modules/.bin/mocha tests -u tdd"
