@@ -14,16 +14,20 @@ object-ref-structure: object-token(structure-index, which will determine # of pr
 object-own-structure: 0xc1 object-token(length of structure), structure, ...values
 
 0x11 is same format as Document, except it inherits and adds to current structure list for parsing.
+
+A document can be defined as "streaming", that continues until the end of the stream with:
+0xc9, 0x10 (or 0x11), 0xff, 0xff, 0xff, 0xff
 */
 
 
 const msgpack = require('msgpack-lite')
 const documentPacker = require('./lib/write-doc').documentPacker
 const documentUnpackerLazy = require('./lib/read-doc').documentUnpackerLazy
-const EncodeStream = require('./lib/encode-stream').EncodeStream
 
 const Document = exports.Document = require('./lib/Document').Document
 exports.makeDocument = require('./lib/Document').makeDocument
+exports.createEncodeStream = require('./lib/encode-stream').createEncodeStream
+exports.createDecodeStream = createDecodeStream
 
 
 function ObjectReference() {}
@@ -33,8 +37,6 @@ function DocumentReferences(object, Type) {
 	this.structureMap = new Map()
 	this.declaredStructures = []
 }
-
-const UNDEFINED = -23 // special marker for undefined slots that only uses one byte
 
 function createCodec() {
 	var codec = msgpack.createCodec()
@@ -68,6 +70,13 @@ exports.decode = (value, options) => {
 	return msgpack.decode(value, options)
 }
 
-exports.createEncodeStream = function() {
-
+function createDecodeStream(options) {
+	if (options) {
+		if (!options.codec) {
+			options.codec = codec
+		}
+	} else {
+		options = DEFAULT_OPTIONS
+	}
+	return msgpack.createDecodeStream(options)
 }

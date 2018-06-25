@@ -1,7 +1,7 @@
 {
   "name": "dpack",
   "author": "Kris Zyp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "MessagePack codec/extension for documents, an object or array that contains reusable structures/templates for more efficient, compact, faster encodings, and for lazy parsing",
   "license": "MIT",
   "repository": {
