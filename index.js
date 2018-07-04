@@ -19,64 +19,10 @@ A document can be defined as "streaming", that continues until the end of the st
 0xc9, 0x10 (or 0x11), 0xff, 0xff, 0xff, 0xff
 */
 
-
-const msgpack = require('msgpack-lite')
-const documentPacker = require('./lib/write-doc').documentPacker
-const documentUnpackerLazy = require('./lib/read-doc').documentUnpackerLazy
-
 const Document = exports.Document = require('./lib/Document').Document
 exports.makeDocument = require('./lib/Document').makeDocument
 exports.createEncodeStream = require('./lib/encode-stream').createEncodeStream
-exports.createDecodeStream = createDecodeStream
+exports.createDecodeStream = require('./lib/decode-stream').createDecodeStream
 
-
-function ObjectReference() {}
-function DocumentReferences(object, Type) {
-	this.object = object
-	this.Type = Type
-	this.structureMap = new Map()
-	this.declaredStructures = []
-}
-
-function createCodec() {
-	var codec = msgpack.createCodec()
-	codec.addExtPacker(0x10, Document, documentPacker)
-	codec.addExtUnpacker(0x10, documentUnpackerLazy)
-	return codec
-}
-var codec = createCodec()
-exports.codec = codec
-var DEFAULT_OPTIONS = { codec: codec }
-exports.createCodec = createCodec
-exports.encode = (value, options) => {
-	if (options) {
-		if (!options.codec) {
-			options.codec = codec
-		}
-	} else {
-		options = DEFAULT_OPTIONS
-	}
-	return msgpack.encode(value, options)
-}
-
-exports.decode = (value, options) => {
-	if (options) {
-		if (!options.codec) {
-			options.codec = codec
-		}
-	} else {
-		options = DEFAULT_OPTIONS
-	}
-	return msgpack.decode(value, options)
-}
-
-function createDecodeStream(options) {
-	if (options) {
-		if (!options.codec) {
-			options.codec = codec
-		}
-	} else {
-		options = DEFAULT_OPTIONS
-	}
-	return msgpack.createDecodeStream(options)
-}
+exports.decode = require('./lib/decode').decode
+exports.encode = require('./lib/encode').encode

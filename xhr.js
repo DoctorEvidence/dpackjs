@@ -1,28 +1,26 @@
-var DecodeBuffer = require('msgpack-lite/lib/decode-buffer').DecodeBuffer
+var createDecoder = require('./lib/decode').createDecoder
 
 exports.DecodedXMLHttpRequest = function() {
     var xhr = new XMLHttpRequest()
     var whenProgressDecoded
     var decoder
     xhr.addEventListener('progress', function(event) {
-    	var arrayBuffer = xhr.response
+    	var sourceText = xhr.responseText
     	if (!decoder) {
-    		if (arrayBuffer && /msgpack/.test(xhr.getResponseHeader('Content-Type'))) {
-	    		decoder = new DecodeBuffer()
-		    	decoder.offset = 0
+    		if (sourceText && /dpack/.test(xhr.getResponseHeader('Content-Type'))) {
+	    		decoder = createDecoder()
     		}
 	    	else
 	    		return
     	}
-    	decoder.buffer = new Uint8Array(arrayBuffer)
     	if (decoder.onResume) {
-    		decoder.onResume(arrayBuffer)
+    		decoder.onResume(sourceText)
     		whenProgressDecoded.then(function(value) {
     			xhr.responseDecoded = value // completed successfully
     		}, onError)
     	}
 		try {
-			xhr.responseDecoded = decoder.codec.decode(decoder)
+			xhr.responseDecoded = decoder.decode(sourceText)
 		} catch (error) {
 			onError(error)
 		}
