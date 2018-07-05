@@ -11,11 +11,14 @@ MessagePack codec/extension for documents, an object or array that contains reus
 
 
 ## Specification
-The basic entity in the DPack is a block which consists of a `type` which consists of 2 bit (unsigned) integer and an accompanying number which consists of up to 40 bit (unsigned) integer. This is encoded with 1 to 6 bytes. All bytes have an initial 0 bit (only 0 - 127 byte range are used). The second byte is always a "stop" bit. A one means this is the last byte, a zero means additional bytes are part of the block. In the first byte, The next two bits (3rd and 4th) represent the `type` of the block. The remaining bits, the first four bits of the first byte, and all remaining bytes (up to and including a byte with a stop bit) are used to encode the accompanying number, which is interpreted by big endian bytes/bits.
+The basic entity in the DPack is a block which consists of a `type` which consists of 2 bit (unsigned) integer and an accompanying number which consists of up to 40 bit (unsigned) integer. This is encoded with 1 to 6 bytes. All bytes have an initial 0 bit (only 0 - 127 byte range are used). The second bit is always a "stop" bit. A one means this is the last byte, a zero means additional bytes are part of the block. In the first byte, The next two bits (3rd and 4th) represent the `type` of the block. The remaining bits, the first four bits of the first byte, and all remaining bytes (up to and including a byte with a stop bit) are used to encode the accompanying number, which is interpreted by big endian bytes/bits.
 For example:
 0 1 0 1 0 0 1 0 - Stop bit is set (1), type (0 1) is 1, and accompanying number (0 0 1 0) is 2.
 0 0 1 0 0 0 0 1 - Stop bit is not set (0), type (1 0) is 2, bits (0 0 0 1) will be added to next byte:
-	0 1 0 0 0 1 0 0 - Stop bit is set. Combined bits (0 0 0 1  0 0 0 1 0 0) make 68 the accompanying number.
+ next: 0 1 0 0 0 1 0 0 - Stop bit is set. Combined bits (0 0 0 1  0 0 0 1 0 0) make 68 the accompanying number.
+
+extension entity:
+1 1 0 t t t t stop-bit  1 0 t t n n n n
 
 There may be up to 8 bytes, which accomodates up to 46 bits for the accompanying number, therefore it must be an unsigned integers under 2^46.
 
@@ -40,24 +43,26 @@ type 0: The value is determined by the accompanying number:
 	8 - object - read the next block in object mode
 	9 - string - read the next block in string mode
 	10 - date - next block is a number (read in open mode) as date in epoch milliseconds
-	11 - isolated structure/property/value tables - (read the next block in object mode)
-	12 - Object with property positions specified
-	13 - binary (base 64) (next block is read in string mode as a base 64 string to be decoded as a binary struture)
+	11 - Map (read next block as array in open mode for keys, next block again as array in open mode for values)
+	12 - Set (read next block as array in open mode)
+	13 - Value with length defined. Read the next block in open mode as a number to determine length, and then the next block after that in open to determine value
+	14 - Value with referenceable id (read the next block as a number to determine the id, and the next block in open mode)
+	15 - binary (base 64) (next block is read in string mode as a base 64 string to be decoded as a binary struture)
 	... - extensions
 	15 - gzip
 
 type 1: The accompanying number is the actual decoded value (an unsigned integer)
 type 2: The accompanying number is the length of as string, which should be parsed as a number. For example, a string could be "-2.32".
 type 3: And array of values, each to be successively read in open mode. The accompanying number specifies the number of values in the array.
+type 8(4): named extension
+type 8(5): extension self-parsed
 
 ### Object Mode
 In object mode, `type` is interpreted:
 type 1 - Object with inline property structure. An object/map is encoded and will be decoded by first reading a structure definition of the properties, and then the values of the property. The accompanying number defines the number of properties (and values). The property structure is decoded in property mode, with the given number of properties, which define the property names and types that will be created on the decoded object. This is followed by the property values, in the same order and position as the property definitions. The corresponding property definition defines which read mode to use for each value (i.e. if the first property defines string type, the first value should be read in string mode).
 type 0 - Object with structure reference. The accompanying number is a reference to a previously defined property structure. The structure reference is followed by the values to decoded and assigned to the object based on the position and type as defined in the referenced structure. The referenced structure is a back-reference, and is found by counting sequentially in reverse through the DPack document/file/stream by the inline-defined structures. For example, if the accompanying number is 1, then the last (most recently) defined property structure before this point in the document, is the referenced structure. A number of 2 would be the second to last (0 never used as a back-reference, it should be decoded as null).
 type 2 - object special - quick reference < 16 - >= 16 -
-	17 - object with binary key positions
-	18
-	100 > object reference?
+	16 => object references
 type 3: And array of objects, each to be successively read in object mode. The accompanying number specifies the number of objects in the array.
 
 
@@ -75,10 +80,15 @@ In property mode, `type` is interpreted:
 1: object type with string key (value defines string length)
 2: string type...
 3: open type...
+8(5): object type with string key (value defines string length) with metadata
+8(6): string type with string key (value defines string length) with metadata
+8(7): open type with string key (value defines string length) with metadata
 extended unicode - for metadata
 
 
+
 buffers?
+document specified
 documents (lazy evaluation)?
 property metadata
 extensions
