@@ -15,18 +15,35 @@ suite('encode', () => {
   			{ a: 4, name: 'four', type: 'even'},
   			{ a: 5, name: 'five', type: 'odd', isOdd: true },
   			{ a: 6, name: 'six', type: 'even', isOdd: null }
-		],
-		description: 'some names',
-		types: ['odd', 'even'],
-		convertEnumToNum: [
-			{ prop: 'test' },
-			{ prop: 'test' },
-			{ prop: 'test' },
-			{ prop: 1 },
-			{ prop: 2 },
-			{ prop: null }
-		]
-	}
+  		],
+  		description: 'some names',
+  		types: ['odd', 'even'],
+  		convertEnumToNum: [
+  			{ prop: 'test' },
+  			{ prop: 'test' },
+  			{ prop: 'test' },
+  			{ prop: 1 },
+  			{ prop: 2 },
+  			{ prop: null }
+  		]
+  	}
+    const encoded = encode(data)
+    const decoded = decode(encoded)
+    assert.deepEqual(decoded, data)
+  })
+
+  test('numbers', () => {
+    const data = {
+      dateEpoch: 1530886513200,
+      realBig: 3432235352353255323,
+      decimal: 32.55234,
+      negative: -34.11,
+      exponential: 0.234e123,
+      tiny: 3.233e-120,
+      zero: 0,
+      //negativeZero: -0,
+      Infinity: Infinity
+    }
     const encoded = encode(data)
     const decoded = decode(encoded)
     assert.deepEqual(decoded, data)

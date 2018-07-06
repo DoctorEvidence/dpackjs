@@ -24,5 +24,7 @@ exports.makeDocument = require('./lib/Document').makeDocument
 exports.createEncodeStream = require('./lib/encode-stream').createEncodeStream
 exports.createDecodeStream = require('./lib/decode-stream').createDecodeStream
 
-exports.decode = require('./lib/decode').decode
 exports.encode = require('./lib/encode').encode
+exports.decode = require('./lib/decode').decode
+exports.createEncoder = require('./lib/encode').createEncoder
+exports.createDecoder = require('./lib/decode').createDecoder
