@@ -1,5 +1,7 @@
 var createDecoder = require('./lib/decode').createDecoder
 
+window.createDecoder = createDecoder
+window.encode = require('./lib/encode').encode
 exports.fetch = function fetch(url, request) {
 	if (request) {
 		request.url = url
@@ -57,12 +59,13 @@ exports.fetch = function fetch(url, request) {
 		    	}
 		    	if (decoder.onResume) {
 		    		decoder.onResume(sourceText)
-		    		whenProgressDecoded.then(function(value) {
+		    		return whenProgressDecoded.then(function(value) {
 		    			xhr.responseDecoded = value // completed successfully
 		    		}, onError)
 		    	}
 				try {
-					xhr.responseDecoded = decoder.decode(sourceText)
+					decoder.setSource(sourceText)
+					xhr.responseDecoded = decoder.readOpen()
 				} catch (error) {
 					onError(error)
 				}
@@ -71,7 +74,7 @@ exports.fetch = function fetch(url, request) {
 						whenProgressDecoded = error.whenResumed
 						xhr.responseDecoded = error.valueInProgress
 					} else {
-						reject(error)
+						responseReject(error)
 					}
 				}
 		    })

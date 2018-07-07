@@ -45,8 +45,8 @@ type 0: The value is determined by the accompanying number:
 	10 - date - next block is a number (read in open mode) as date in epoch milliseconds
 	11 - Map (read next block as array in open mode for keys, next block again as array in open mode for values)
 	12 - Set (read next block as array in open mode)
-	13 - Value with length defined. Read the next block in open mode as a number to determine length, and then the next block after that in open to determine value
-	14 - Value with referenceable id (read the next block as a number to determine the id, and the next block in open mode)
+	13 - Value with length defined. Read the next block in open mode as a number to determine length, and then the next block after that in open mode to determine value
+	14 - Object with referenceable id (read the next block as a number to determine the id, and the next block in open mode)
 	15 - binary (base 64) (next block is read in string mode as a base 64 string to be decoded as a binary struture)
 	... - extensions
 	15 - gzip
@@ -54,8 +54,9 @@ type 0: The value is determined by the accompanying number:
 type 1: The accompanying number is the actual decoded value (an unsigned integer)
 type 2: The accompanying number is the length of as string, which should be parsed as a number. For example, a string could be "-2.32".
 type 3: And array of values, each to be successively read in open mode. The accompanying number specifies the number of values in the array.
-type 8(4): named extension
-type 8(5): extension self-parsed
+4(8): object (read next block in object mode) with metadata
+5(9): string (read next block in string mode) with metadata
+6(10): open (read next block in open mode) with metadata
 
 ### Object Mode
 In object mode, `type` is interpreted:
@@ -80,9 +81,9 @@ In property mode, `type` is interpreted:
 1: object type with string key (value defines string length)
 2: string type...
 3: open type...
-8(5): object type with string key (value defines string length) with metadata
-8(6): string type with string key (value defines string length) with metadata
-8(7): open type with string key (value defines string length) with metadata
+4(8): object type with string key (value defines string length) with metadata
+5(9): string type with string key (value defines string length) with metadata
+6(10): open type with string key (value defines string length) with metadata
 extended unicode - for metadata
 
 
