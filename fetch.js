@@ -60,19 +60,25 @@ exports.fetch = function fetch(url, request) {
 		    	if (decoder.onResume) {
 		    		decoder.onResume(sourceText)
 		    		return whenProgressDecoded.then(function(value) {
-		    			xhr.responseDecoded = value // completed successfully
+		    			xhr.responseDecoded = xhr.responseDecoded || value // completed successfully (only assign value if it isn't assigned yet)
+		    			while (decoder.hasMoreData) {
+		    				decoder.readOpen()
+		    			}
 		    		}, onError)
 		    	}
 				try {
 					decoder.setSource(sourceText)
 					xhr.responseDecoded = decoder.readOpen()
+	    			while (decoder.hasMoreData) {
+	    				decoder.readOpen()
+	    			}
 				} catch (error) {
 					onError(error)
 				}
 				function onError(error) {
 					if (error.message == 'BUFFER_SHORTAGE') {
 						whenProgressDecoded = error.whenResumed
-						xhr.responseDecoded = error.valueInProgress
+						xhr.responseDecoded = xhr.responseDecoded || error.valueInProgress
 					} else {
 						responseReject(error)
 					}
