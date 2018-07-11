@@ -79,6 +79,9 @@ exports.fetch = function fetch(url, request) {
 					if (error.message == 'BUFFER_SHORTAGE') {
 						whenProgressDecoded = error.whenResumed
 						xhr.responseDecoded = xhr.responseDecoded || error.valueInProgress
+						if (request.onProgress) {
+							request.onProgress(xhr.responseDecoded, xhr)
+						}
 					} else {
 						responseReject(error)
 					}
