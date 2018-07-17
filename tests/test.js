@@ -2,7 +2,7 @@ const { assert } = require('chai')
 const { deflateSync, inflateSync } = require('zlib')
 const { encode, decode, createDecodeStream, createEncodeStream } = require('..')
 const inspector =  require('inspector')
-inspector.open(9329, null, true)
+//inspector.open(9329, null, true)
 
 suite('encode', () => {
   test('encode/decode data', () => {
@@ -74,7 +74,7 @@ suite('encode', () => {
     assert.deepEqual(decoded, data)
   })
 
-  test.only('encode/decode stream with promise', () => {
+  test('encode/decode stream with promise', () => {
   	const encodeStream = createEncodeStream({
   	})
   	const decodeStream = createDecodeStream()
