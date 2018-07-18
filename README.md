@@ -69,8 +69,8 @@ type 3: And array of objects, each to be successively read in object mode. The a
 
 ### String Mode
 In string mode, `type` is interpreted:
-0: reserved
-1: inline string
+0: inline string, non-referenceable
+1: inline string, referenceable
 2: string back reference
 type 3: And array of strings, each to be successively read in string mode. The accompanying number specifies the number of strings in the array.
 string length = num

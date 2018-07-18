@@ -31,6 +31,23 @@ suite('encode', () => {
     assert.deepEqual(decoded, data)
   })
 
+  test.skip('extended class', () => {
+    function Extended() {
+
+    }
+    Extended.prototype.getDouble = function() {
+      return this.value * 2
+    }
+    const instance = new Extended()
+    instance.value = 4
+    const data = {
+      extendedInstance: instance
+    }
+    const encoded = encode(data)
+    const decoded = decode(encoded)
+    assert.equal(decoded.extendedInstance.getDouble(), 8)
+  })
+
   test('numbers', () => {
     const data = {
       dateEpoch: 1530886513200,
