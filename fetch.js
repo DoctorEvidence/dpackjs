@@ -1,7 +1,7 @@
-var createDecoder = require('./lib/decode').createDecoder
+var createParser = require('./lib/parse').createParser
 
-window.createDecoder = createDecoder
-window.encode = require('./lib/encode').encode
+window.createParser = createParser
+window.serialize = require('./lib/serialize').serialize
 exports.fetch = function fetch(url, request) {
 	if (request) {
 		request.url = url
@@ -10,8 +10,8 @@ exports.fetch = function fetch(url, request) {
 	}
 	return new Promise(function(requestResolve, requestReject) {
 	    var xhr = new XMLHttpRequest()
-	    var whenProgressDecoded
-	    var decoder
+	    var whenProgressParsed
+	    var parser
 	    var responseResolve
 	    var responseRejected
 	    var responsePromise = new Promise(function(responseResolve, responseReject) {
@@ -34,7 +34,7 @@ exports.fetch = function fetch(url, request) {
 		    				},
 		    				dpack: function() {
 		    					return responsePromise.then(function() {
-			    					return xhr.responseDecoded
+			    					return xhr.responseParsed
 			    				})
 		    				},
 		    				ok: xhr.status < 300 && xhr.status >= 200,
@@ -50,37 +50,37 @@ exports.fetch = function fetch(url, request) {
 		    		else
 		    			requestReject('Network error')
 		    	}
-		    	if (!decoder) {
+		    	if (!parser) {
 		    		if (sourceText && /dpack/.test(xhr.getResponseHeader('Content-Type'))) {
-			    		decoder = createDecoder()
+			    		parser = createParser()
 		    		}
 			    	else
 			    		return
 		    	}
-		    	if (decoder.onResume) {
-		    		decoder.onResume(sourceText)
-		    		return whenProgressDecoded.then(function(value) {
-		    			xhr.responseDecoded = xhr.responseDecoded || value // completed successfully (only assign value if it isn't assigned yet)
-		    			while (decoder.hasMoreData) {
-		    				decoder.readOpen()
+		    	if (parser.onResume) {
+		    		parser.onResume(sourceText)
+		    		return whenProgressParsed.then(function(value) {
+		    			xhr.responseParsed = xhr.responseParsed || value // completed successfully (only assign value if it isn't assigned yet)
+		    			while (parser.hasMoreData) {
+		    				parser.readOpen()
 		    			}
 		    		}, onError)
 		    	}
 				try {
-					decoder.setSource(sourceText)
-					xhr.responseDecoded = decoder.readOpen()
-	    			while (decoder.hasMoreData) {
-	    				decoder.readOpen()
+					parser.setSource(sourceText)
+					xhr.responseParsed = parser.readOpen()
+	    			while (parser.hasMoreData) {
+	    				parser.readOpen()
 	    			}
 				} catch (error) {
 					onError(error)
 				}
 				function onError(error) {
 					if (error.message == 'BUFFER_SHORTAGE') {
-						whenProgressDecoded = error.whenResumed
-						xhr.responseDecoded = xhr.responseDecoded || error.valueInProgress
+						whenProgressParsed = error.whenResumed
+						xhr.responseParsed = xhr.responseParsed || error.valueInProgress
 						if (request.onProgress) {
-							request.onProgress(xhr.responseDecoded, xhr)
+							request.onProgress(xhr.responseParsed, xhr)
 						}
 					} else {
 						responseReject(error)

@@ -2,14 +2,14 @@
 DPack - Fast, compact object structure encoding.
 */
 
-exports.createEncodeStream = require('./lib/encode-stream').createEncodeStream
-exports.createDecodeStream = require('./lib/decode-stream').createDecodeStream
-const encode = require('./lib/encode')
-const decode = require('./lib/decode')
+exports.createSerializeStream = require('./lib/serialize-stream').createSerializeStream
+exports.createParseStream = require('./lib/parse-stream').createParseStream
+const serialize = require('./lib/serialize')
+const parse = require('./lib/parse')
 
-exports.encode = encode.encode
-exports.decode = decode.decode
-exports.createEncoder = encode.createEncoder
-exports.createDecoder = decode.createDecoder
-exports.decodeLazy = decode.decodeLazy
-exports.makeBlock = require('./lib/Block').makeBlock
+exports.serialize = serialize.serialize
+exports.parse = parse.parse
+exports.createSerializer = serialize.createSerializer
+exports.createParser = parse.createParser
+exports.parseLazy = parse.parseLazy
+exports.asBlock = require('./lib/Block').asBlock
