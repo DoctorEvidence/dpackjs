@@ -44,9 +44,9 @@ type 0: The value is determined by the accompanying number:
 	9 - string - read the next block in string mode
 	10 - open - read  the next block in open mode (no-op)
 	11 - date - next block is a number (read in open mode) as date in epoch milliseconds
-	12 - Begin block
-	13 - Begin Block (with length defined). Read the next block in open mode as a number to determine length, and then the next block after that in open mode to determine value
-	14 - Identifier for block (read the next block as a number to determine the id, and the next block in open mode)
+	12 - Begin section with identifier the next entity as a number, in open mode, to determine the id, and the next data in open mode)
+	13 - Define length of next section data. Read the next block in open mode as a number to determine length, and then the next block after that in open mode to determine value
+	14 - End Block
 	15 - binary (base 64) (next block is read in string mode as a base 64 string to be parsed as a binary struture)
 	... - extensions
 	15 - gzip
@@ -125,3 +125,25 @@ simpler binary level specification
 utf-8 with 2 byte cutoff
 double byte less bits, but quadruple bits
 7, 10, 16, 22
+
+
+
+e = end block
+l = length defined
+i = start block with id
+m = message
+v = version
+
+streaming ipc with block:
+s m m l(m)-i(l(m))e m
+
+simple db entry
+v m
+
+db entry with blocks
+v l(m) i(l(m))e i(l(m))e
+
+streaming to browser with data with db entries:
+m i(l(m))e i(l(m) i(l(m))e i(l(m))e)e
+
+
