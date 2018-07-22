@@ -1,3 +1,4 @@
+"use strict"
 var createParser = require('./lib/parse').createParser
 
 window.createParser = createParser
@@ -61,7 +62,7 @@ exports.fetch = function fetch(url, request) {
 		    		parser.onResume(sourceText)
 		    		return whenProgressParsed.then(function(value) {
 		    			xhr.responseParsed = xhr.responseParsed || value // completed successfully (only assign value if it isn't assigned yet)
-		    			while (parser.hasMoreData) {
+		    			while (parser.hasUnfulfilledReferences()) {
 		    				parser.readOpen()
 		    			}
 		    		}, onError)
@@ -69,7 +70,7 @@ exports.fetch = function fetch(url, request) {
 				try {
 					parser.setSource(sourceText)
 					xhr.responseParsed = parser.readOpen()
-	    			while (parser.hasMoreData) {
+	    			while (parser.hasUnfulfilledReferences()) {
 	    				parser.readOpen()
 	    			}
 				} catch (error) {
