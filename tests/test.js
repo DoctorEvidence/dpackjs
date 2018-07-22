@@ -1,6 +1,6 @@
 const { assert } = require('chai')
 const { deflateSync, inflateSync } = require('zlib')
-const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock } = require('..')
+const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
 const inspector =  require('inspector')
 //inspector.open(9329, null, true)
 
@@ -31,7 +31,7 @@ suite('serialize', () => {
     assert.deepEqual(parsed, data)
   })
 
-  test.skip('extended class', () => {
+  test('extended class', () => {
     function Extended() {
 
     }
@@ -43,9 +43,36 @@ suite('serialize', () => {
     const data = {
       extendedInstance: instance
     }
+    const options = new Options()
+    options.addExtension(Extended)
+    const serialized = serialize(data, options)
+    const parsed = parse(serialized, options)
+    assert.equal(parsed.extendedInstance.getDouble(), 8)
+  })
+
+  test('set/map/date', () => {
+    var map = new Map()
+    map.set(4, 'four')
+    map.set('three', 3)
+
+    var set = new Set()
+    set.add(1)
+    set.add('2')
+    set.add({ name: 3})
+
+    const data = {
+      map: map,
+      set: set,
+      date: new Date(1532219539819)
+    }
     const serialized = serialize(data)
     const parsed = parse(serialized)
-    assert.equal(parsed.extendedInstance.getDouble(), 8)
+    assert.equal(parsed.map.get(4), 'four')
+    assert.equal(parsed.map.get('three'), 3)
+    assert.equal(parsed.date.getTime(), 1532219539819)
+    assert.isTrue(parsed.set.has(1))
+    assert.isTrue(parsed.set.has('2'))
+    assert.isFalse(parsed.set.has(3))
   })
 
   test('numbers', () => {

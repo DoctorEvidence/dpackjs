@@ -1,11 +1,13 @@
 <a href="https://dev.doctorevidence.com/"><img src="./assets/powers-dre.png" width="203" /></a>
 
-DPack is object format that provides more compact encoding and faster decoding than JSON and other formats. DPack has several key features:
-* Uses internal structural, property, value references for compact encoding and fast decoding.
-* Defined such that serialized data is also a valid UTF-8 encoding (or any other ASCII-compatible encoding), which allows for single-pass text decoding for faster and simpler decoding (particulary in browser)
+DPack is binary format for serializing data structures that is very compact, designed for efficient, high-performance decoding/parsing, and optimized for web use. For common large data structures that we see in applications, a DPack file is typically about 60-70% smaller than JSON (and about 50% smaller than MsgPack), and can be parsed about 80% faster than JSON and other formats. DPack has several key features:
+* Uses internal referencing and reuse of structures, property, value for compact encoding and fast decoding.
+* Defined such that serialized data is also a valid UTF-8 (or any other unicode-compatible encoding), which allows for single-pass text decoding for faster and simpler decoding (particulary in browser), support across older browsers, and ease of manipulation as a character string.
+* Supports a wide range of types including strings, decimal-based numbers, booleans, objects, arrays, dates, maps, sets, and user-provided classes.
 * Supports streaming, progressive decoding.
-* Supports positional object properties for lazy evaluation of paths for faster access to data from databases.
-* Serialize numbers in decimal for no precision lost.
+* Supports positionally mapped object properties for lazy evaluation of paths for faster access to data from databases.
+* Optimized to compress well with Huffman/Gzip encoding schemes
+* Less than 15KB minimized (5KB gzipped)
 
 MessagePack codec/extension for documents, an object or array that contains reusable structures/templates for more efficient, compact, faster encodings, and for lazy parsing.
 
@@ -43,13 +45,10 @@ type 0: The value is determined by the accompanying number:
 	8 - object - read the next block in object mode
 	9 - string - read the next block in string mode
 	10 - open - read  the next block in open mode (no-op)
-	11 - date - next block is a number (read in open mode) as date in epoch milliseconds
-	12 - Begin section with identifier the next entity as a number, in open mode, to determine the id, and the next data in open mode)
-	13 - Define length of next section data. Read the next block in open mode as a number to determine length, and then the next block after that in open mode to determine value
-	14 - End Block
-	15 - binary (base 64) (next block is read in string mode as a base 64 string to be parsed as a binary struture)
-	... - extensions
-	15 - gzip
+	11 - extended type - read the next block in open mode to determine type, and block after with extension reader
+	12 - Value with identifier. Read the next entity as a number, in open mode, to determine the id, and the next data in open mode)
+	13 - Begin document and define length of next section data. Read the next block in open mode as a number to determine length, and then the next block after that in open mode to determine value
+	14 - End document
 
 type 1: The accompanying number is the actual parsed value (an unsigned integer)
 type 2: The accompanying number is the length of as string, which should be serialized as a number. For example, a string could be "-2.32".
@@ -60,8 +59,7 @@ type 3: And array of values, each to be successively read in open mode. The acco
 
 ### Object Mode
 In object mode, `type` is interpreted:
-type 0 - object special - quick reference < 16 - >= 16 -
-	16 => object references
+type 0 - object identify/reference - Identifies this objects, connecting it to an identity, that may be defined or used elsewhere. The next block should be read in object mode to read any properties assigned to immediately.
 type 1 - Object with inline property structure. An object/map is serialized and will be parsed by first reading a structure definition of the properties, and then the values of the property. The accompanying number defines the number of properties (and values). The property structure is parsed in property mode, with the given number of properties, which define the property names and types that will be created on the parsed object. This is followed by the property values, in the same order and position as the property definitions. The corresponding property definition defines which read mode to use for each value (i.e. if the first property defines string type, the first value should be read in string mode).
 type 2 - Object with structure reference. The accompanying number is a reference to a previously defined property structure. The structure reference is followed by the values to parsed and assigned to the object based on the position and type as defined in the referenced structure. The referenced structure is a back-reference, and is found by counting sequentially in reverse through the DPack document/file/stream by the inline-defined structures. For example, if the accompanying number is 1, then the last (most recently) defined property structure before this point in the document, is the referenced structure. A number of 2 would be the second to last (0 never used as a back-reference, it should be parsed as null).
 type 3: And array of objects, each to be successively read in object mode. The accompanying number specifies the number of objects in the array.
