@@ -1,13 +1,17 @@
 <a href="https://dev.doctorevidence.com/"><img src="./assets/powers-dre.png" width="203" /></a>
 
-DPack is extremely compact binary format for serializing data structures, designed for efficient, high-performance serialization/parsing, and optimized for web use. For common large data structures in applications, a DPack file is typically about 70% smaller than JSON (and about 60% smaller than MsgPack), and can be parsed about 80% faster (40% less time) than JSON and other formats. DPack has several key features:
-* Uses internal referencing and reuse of structures, property, value for remarkably compact encoding and fast decoding.
+DPack is a very compact binary format for serializing data structures, designed for efficient, high-performance serialization/parsing, and optimized for web use. For common large data structures in applications, a DPack file is typically about 70% smaller than JSON (and about 60% smaller than MsgPack), and can be parsed about 70% faster (40% less time) than JSON and other formats. DPack has several key features:
+* Uses internal referencing and reuse of structures, properties, values, and objects for remarkably compact serialization and fast parsing.
 * Defined as a valid unicode character string, which allows for single-pass text decoding for faster and simpler decoding (particulary in browser), support across older browsers, and ease of manipulation as a character string. It  can also be encoded in UTF-8, UTF-16, or any ASCII compatible encoding.
 * Supports a wide range of types including strings, decimal-based numbers, booleans, objects, arrays, dates, maps, sets, and user-provided classes.
-* This library supports streaming, progressive decoding.
 * Supports positionally mapped object properties for lazy evaluation of paths for faster access to data without parsing entire data structures (useful for storing, querying, and indexing data in databases).
+* Supports referencing of objects which can be used to reorder serialization and reuse objects.
 * Optimized to compress well with Huffman/Gzip encoding schemes
-* Less than 15KB minimized (5KB gzipped)
+
+In addition this DPack library features:
+* Streaming, progressive parsing in the browser, so data can be parsed during download instead of waiting until it completed.
+* Asynchronous, progressive streaming of data from Node, utilizing back-pressure to load and stream data while miminizing memory/resource consumption.
+* Less than 15KB minimized (5KB gzipped).
 
 ## Intended Use
 

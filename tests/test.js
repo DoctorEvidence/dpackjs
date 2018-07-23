@@ -190,7 +190,6 @@ suite('serialize', () => {
   })
   test('serialize/parse stream', () => {
     const serializeStream = createSerializeStream({
-      asDocument: true,
     })
     const parseStream = createParseStream()
     serializeStream.pipe(parseStream)
@@ -215,6 +214,44 @@ suite('serialize', () => {
         assert.deepEqual(received, messages)
         resolve()
       }, 10)
+    })
+  })
+  test('serialize/parse stream, intermittent', () => {
+    const serializeStream = createSerializeStream({
+    })
+    const parseStream = createParseStream()
+    let queue = Buffer.from([])
+    serializeStream.on('data', data => {
+      queue = Buffer.concat([queue, data])
+    })
+    let offset = 0
+    const received = []
+    parseStream.on('data', data => {
+      received.push(data)
+    })
+    const messages = [{
+      name: 'first'
+    }, {
+      name: 'second'
+    }, {
+      name: 'third'
+    }, {
+      name: 'third',
+      extra: [1, 3, { foo: 'hi'}, 'bye']
+    }]
+    for (const message of messages)
+      serializeStream.write(message)
+    return new Promise((resolve, reject) => {
+      function sendNext() {
+        parseStream.write(queue.slice(offset, offset += 3))
+        if (offset < queue.length) {
+          setTimeout(sendNext)
+        } else {
+          assert.deepEqual(received, messages)
+          resolve()
+        }
+      }
+      setTimeout(sendNext)
     })
   })
   test.skip('big utf8', function() {
