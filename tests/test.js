@@ -4,8 +4,8 @@ const { serialize, parse, parseLazy, createParseStream, createSerializeStream, a
 const { decode, encode } = require('msgpack-lite')
 const inspector = require('inspector')
 const fs = require('fs')
-//inspector.open(9329, null, true)
-var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/jira-board.json'))
+inspector.open(9329, null, true)
+var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 const ITERATIONS = 1000
 
 suite('serialize', () => {
@@ -272,7 +272,7 @@ suite('serialize', () => {
     }
   })
 
-  test('performance msgpack-lite', function() {
+  test.skip('performance msgpack-lite', function() {
     var data = sampleData
     this.timeout(10000)
     const serialized = encode(data)
@@ -333,7 +333,7 @@ suite('serialize', () => {
       //const serializedGzip = deflateSync(serialized, {  level: 3 })
     }
   })
-  test('performance encode msgpack-lite', function() {
+  test.skip('performance encode msgpack-lite', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
