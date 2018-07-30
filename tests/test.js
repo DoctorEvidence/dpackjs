@@ -4,7 +4,7 @@ const { serialize, parse, parseLazy, createParseStream, createSerializeStream, a
 const { decode, encode } = require('msgpack-lite')
 const inspector = require('inspector')
 const fs = require('fs')
-inspector.open(9329, null, true)
+//inspector.open(9329, null, true)
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 const ITERATIONS = 1000
 
@@ -237,7 +237,8 @@ suite('serialize', () => {
     }, {
       name: 'second'
     }, {
-      name: 'third'
+      name: 'third',
+      aBlock: asBlock({ name: 'in block' })
     }, {
       name: 'third',
       extra: [1, 3, { foo: 'hi'}, 'bye']
