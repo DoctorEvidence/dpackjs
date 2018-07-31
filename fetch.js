@@ -2,12 +2,20 @@
 var createParser = require('./lib/parse').createParser
 
 window.createParser = createParser
-window.serialize = require('./lib/serialize').serialize
+var serialize = window.serialize = require('./lib/serialize').serialize
 exports.fetch = function fetch(url, request) {
 	if (request) {
 		request.url = url
+	} else if (typeof url === 'string') {
+		request = { url: url }
 	} else {
 		request = url
+	}
+	if (!request.headers) {
+		request.headers = {}
+	}
+	if (!request.headers.Accept) {
+		request.headers.Accept = 'text/dpack;q=1,application/json;q=0.7'
 	}
 	return new Promise(function(requestResolve, requestReject) {
 		var xhr = new XMLHttpRequest()
@@ -60,7 +68,8 @@ exports.fetch = function fetch(url, request) {
 				}
 				try {
 					if (parser.onResume) {
-						xhr.responseParsed = xhr.responseParsed || parser.onResume(sourceText)
+						var updatedData = parser.onResume(sourceText)
+						xhr.responseParsed = xhr.responseParsed || updatedData
 					} else {
 						parser.setSource(sourceText)
 						xhr.responseParsed = parser.readOpen()
@@ -89,10 +98,10 @@ exports.fetch = function fetch(url, request) {
 			for (var name in request.xhrFields || {}) {
 				xhr[name] = request.xhrFields[name]
 			}
-			for (var name in request.headers || {}) {
+			for (var name in request.headers) {
 				xhr.setRequestHeader(name, request.headers[name])
 			}
-			xhr.send(request.body)
+			xhr.send(request.data)
 		})
 	})
 }

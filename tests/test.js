@@ -1,10 +1,12 @@
 const { assert } = require('chai')
 const { deflateSync, inflateSync, constants } = require('zlib')
-const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
-const { decode, encode } = require('msgpack-lite')
+try {
+  var { decode, encode } = require('msgpack-lite')
+} catch (error) {}
 const inspector = require('inspector')
 const fs = require('fs')
 //inspector.open(9329, null, true)
+const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 const ITERATIONS = 1000
 
@@ -141,11 +143,11 @@ suite('serialize', () => {
       nonBlock: 'just a string',
   		block1: asBlock({ a: 1, name: 'one', type: 'odd', isOdd: true }),
   		block2: asBlock({ a: 2, name: 'two', type: 'even'}),
-  /*		arrayOfBlocks : [
+  		arrayOfBlocks : [
         asBlock({ a: 3, name: 'three', type: 'odd', isOdd: true }),
   			asBlock({ a: 4, name: 'four', type: 'even'}),
   			asBlock({ a: 5, name: 'five', type: 'odd', isOdd: true })
-      ]*/
+      ]
   	}
     const serialized = serialize(data)
     const parsed = parseLazy(serialized)

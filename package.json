@@ -2,7 +2,7 @@
   "name": "dpack",
   "author": "Kris Zyp",
   "version": "0.1.0",
-  "description": "MessagePack codec/extension for documents, an object or array that contains reusable structures/templates for more efficient, compact, faster encodings, and for lazy parsing",
+  "description": "Efficient, compact binary format for serializing data structures with extensible typing",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -18,8 +18,9 @@
   },
   "optionalDependencies": {},
   "devDependencies": {
-    "mocha": "^4",
+    "@types/node": "latest",
     "chai": "^4",
-    "@types/node": "latest"
+    "mocha": "^4",
+    "webpack-command": "^0.4.1"
   }
 }
