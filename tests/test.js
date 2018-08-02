@@ -1,5 +1,6 @@
 const { assert } = require('chai')
 const { deflateSync, inflateSync, constants } = require('zlib')
+const { compressSync, uncompressSync } = require('snappy')
 try {
   var { decode, encode } = require('msgpack-lite')
 } catch (error) {}
@@ -29,9 +30,17 @@ suite('serialize', () => {
   			{ prop: 'test' },
   			{ prop: 1 },
   			{ prop: 2 },
+        { prop: [undefined] },
   			{ prop: null }
   		]
   	}
+    const serialized = serialize(data)
+    const parsed = parse(serialized)
+    assert.deepEqual(parsed, data)
+  })
+
+  test('serialize/parse sample data', () => {
+    const data = sampleData
     const serialized = serialize(data)
     const parsed = parse(serialized)
     assert.deepEqual(parsed, data)
@@ -300,7 +309,7 @@ suite('serialize', () => {
     let parsed
     for (var i = 0; i < ITERATIONS; i++) {
     	parsed = JSON.parse(serialized)
-    	//parsed = JSON.parse(inflateSync(serializedGzip))
+    	//parsed = JSON.parse(uncompressSync(serializedGzip))
     	parsed.Settings
     }
   })
@@ -314,7 +323,7 @@ suite('serialize', () => {
     let parsed
     for (var i = 0; i < ITERATIONS; i++) {
       parsed = parse(serialized)
-      //parsed = parse(inflateSync(serializedGzip))
+      //parsed = parse(uncompressSync(serializedGzip))
       parsed.Settings
     }
   })
@@ -333,7 +342,7 @@ suite('serialize', () => {
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
       const serialized = serialize(data)
-      //const serializedGzip = deflateSync(serialized, {  level: 3 })
+      //const serializedGzip = deflateSync(serialized)
     }
   })
   test.skip('performance encode msgpack-lite', function() {
@@ -341,7 +350,7 @@ suite('serialize', () => {
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
       const serialized = encode(data)
-      //const serializedGzip = deflateSync(serialized, {  level: 3 })
+      const serializedGzip = deflateSync(serialized)
     }
   })
 })

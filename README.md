@@ -215,6 +215,7 @@ Value Types:
 	6 - string - Read the next token in string mode and return it.
 	7 - open - Read the next token in open mode (no-op) and return it.
 	8 - extended type - read the next token in open mode to determine type, and read the next token in open mode to get value to provide for extension.
+	9 - error - Read the next token in open mode to determine error that occurred.
 
 Block level types (can only occur at the top level of a block):
 	12 - Value with identifier. Read the next value in open mode, to determine the id, and the next data value in open mode to determine the value/object to associate with the id.

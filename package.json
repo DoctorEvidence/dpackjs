@@ -14,13 +14,15 @@
   "main": "./index.js",
   "typings": "./index.d.ts",
   "dependencies": {
-    "webpack": "^4.16.3"
   },
   "optionalDependencies": {},
   "devDependencies": {
     "@types/node": "latest",
     "chai": "^4",
     "mocha": "^4",
+    "msgpack-lite": "^0.1.26",
+    "snappy": "^6.0.4",
+    "webpack": "^4.16.3",
     "webpack-command": "^0.4.1"
   }
 }
