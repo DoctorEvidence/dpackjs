@@ -175,5 +175,7 @@ parsed.smallObject = smallObject;
 ```
 
 ## Specification
-The [specification of the dpack format is available here](https://github.com/DoctorEvidence.com/dpack).
+The [specification of the dpack format is available here](https://github.com/DoctorEvidence/dpack).
+
+
 <a href="https://dev.doctorevidence.com/"><img src="./assets/powers-dre.png" width="203" /></a>
