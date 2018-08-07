@@ -81,7 +81,7 @@ exports.fetch = function fetch(url, request) {
 					onError(error)
 				}
 				function onError(error) {
-					if (error.message == 'BUFFER_SHORTAGE') {
+					if (error.message == 'Unexpected end of dpack stream') {
 						xhr.responseParsed = xhr.responseParsed || error.valueInProgress
 						if (request.onProgress) {
 							request.onProgress(xhr.responseParsed, xhr)

@@ -2,7 +2,7 @@ var webpack = require('webpack')
 var path = require('path')
 module.exports = {
     entry: {
-        index: './fetch.js'
+        index: './browser.js'
     },
     output: {
         path: path.join(__dirname, 'dist'),

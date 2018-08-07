@@ -132,6 +132,7 @@ suite('serialize', () => {
 
   test('numbers', () => {
     const data = {
+      bigEncodable: 48978578104322,
       dateEpoch: 1530886513200,
       realBig: 3432235352353255323,
       decimal: 32.55234,
