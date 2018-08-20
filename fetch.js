@@ -26,7 +26,6 @@ exports.fetch = function fetch(url, request) {
 		var responsePromise = new Promise(function(responseResolve, responseReject) {
 		   	var requestResolved
 			xhr.addEventListener('progress', function(event) {
-				var sourceText = xhr.responseText
 				if (!requestResolved) {
 					requestResolved = true
 					if (xhr.status) {
@@ -59,20 +58,24 @@ exports.fetch = function fetch(url, request) {
 					else
 						requestReject('Network error')
 				}
-				if (!parser) {
-					if (sourceText && /dpack/.test(xhr.getResponseHeader('Content-Type'))) {
-						parser = createParser()
-					}
-					else
-						return
-				}
+				parseTextSoFar()
+			})
+			function parseTextSoFar() {
+				var sourceText = xhr.responseText
 				try {
-					if (parser.onResume) {
-						var updatedData = parser.onResume(sourceText)
-						xhr.responseParsed = xhr.responseParsed || updatedData
+					if (parser) {
+						if (parser.onResume) {
+							var updatedData = parser.onResume(sourceText)
+							xhr.responseParsed = xhr.responseParsed || updatedData
+						}
 					} else {
-						parser.setSource(sourceText)
-						xhr.responseParsed = parser.readOpen()
+						if (sourceText && /dpack/.test(xhr.getResponseHeader('Content-Type'))) {
+							parser = createParser()
+							parser.setSource(sourceText)
+							xhr.responseParsed = parser.readOpen()
+						}
+						else
+							return
 					}
 					while (parser.hasUnfulfilledReferences()) {
 						parser.readOpen()
@@ -80,18 +83,19 @@ exports.fetch = function fetch(url, request) {
 				} catch (error) {
 					onError(error)
 				}
-				function onError(error) {
-					if (error.message == 'Unexpected end of dpack stream') {
-						xhr.responseParsed = xhr.responseParsed || error.valueInProgress
-						if (request.onProgress) {
-							request.onProgress(xhr.responseParsed, xhr)
-						}
-					} else {
-						responseReject(error)
+			}
+			function onError(error) {
+				if (error.message == 'Unexpected end of dpack stream') {
+					xhr.responseParsed = xhr.responseParsed || error.valueInProgress
+					if (request.onProgress) {
+						request.onProgress(xhr.responseParsed, xhr)
 					}
+				} else {
+					responseReject(error)
 				}
-			})
+			}
 			xhr.addEventListener('load', function(event) {
+				parseTextSoFar()
 				responseResolve()
 			})
 			xhr.open(request.method || 'GET', request.url, true)
