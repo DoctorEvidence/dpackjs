@@ -72,14 +72,12 @@ exports.fetch = function fetch(url, request) {
 						if (sourceText && /dpack/.test(xhr.getResponseHeader('Content-Type'))) {
 							parser = createParser()
 							parser.setSource(sourceText)
-							xhr.responseParsed = parser.readOpen()
+							xhr.responseParsed = parser.read()
 						}
 						else
 							return
 					}
-					while (parser.hasUnfulfilledReferences()) {
-						parser.readOpen()
-					}
+					parser.read()
 				} catch (error) {
 					onError(error)
 				}
