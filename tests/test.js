@@ -9,10 +9,10 @@ const fs = require('fs')
 //inspector.open(9329, null, true)
 const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
-const ITERATIONS = 10000
+const ITERATIONS = 1000
 
 suite('serialize', () => {
-  test('serialize/parse data', () => {
+  test.only('serialize/parse data', () => {
   	const data = {
   		data: [
   			{ a: 1, name: 'one', type: 'odd', isOdd: true },
@@ -314,7 +314,7 @@ suite('serialize', () => {
     	parsed.Settings
     }
   })
-  test.only('performance', function() {
+  test('performance', function() {
     var data = sampleData
     this.timeout(10000)
     const serialized = serialize(data)
