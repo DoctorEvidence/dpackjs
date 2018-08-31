@@ -12,7 +12,7 @@ var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 const ITERATIONS = 1000
 
 suite('serialize', () => {
-  test.only('serialize/parse data', () => {
+  test('serialize/parse data', () => {
   	const data = {
   		data: [
   			{ a: 1, name: 'one', type: 'odd', isOdd: true },
@@ -314,7 +314,7 @@ suite('serialize', () => {
     	parsed.Settings
     }
   })
-  test('performance', function() {
+  test.only('performance', function() {
     var data = sampleData
     this.timeout(10000)
     const serialized = serialize(data)
@@ -338,7 +338,7 @@ suite('serialize', () => {
   })
 
 
-  test('performance serialize', function() {
+  test.only('performance serialize', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
