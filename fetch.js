@@ -25,7 +25,9 @@ exports.fetch = function fetch(url, request) {
 		var responseRejected
 		var responsePromise = new Promise(function(responseResolve, responseReject) {
 		   	var requestResolved
-			xhr.addEventListener('progress', function(event) {
+			xhr.addEventListener('progress', receivedData)
+
+			function receivedData(event) {
 				if (!requestResolved) {
 					requestResolved = true
 					if (xhr.status) {
@@ -58,9 +60,6 @@ exports.fetch = function fetch(url, request) {
 					else
 						requestReject('Network error')
 				}
-				parseTextSoFar()
-			})
-			function parseTextSoFar() {
 				var sourceText = xhr.responseText
 				try {
 					if (parser) {
@@ -93,7 +92,7 @@ exports.fetch = function fetch(url, request) {
 				}
 			}
 			xhr.addEventListener('load', function(event) {
-				parseTextSoFar()
+				receivedData()
 				responseResolve()
 			})
 			xhr.open(request.method || 'GET', request.url, true)
