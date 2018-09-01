@@ -300,7 +300,7 @@ suite('serialize', () => {
     }
   })
 
-  test('performance JSON.parse', function() {
+  test.only('performance JSON.parse', function() {
   	this.timeout(10000)
   	var data = sampleData
     const serialized = Buffer.from(JSON.stringify(data))
@@ -321,6 +321,7 @@ suite('serialize', () => {
     const serializedGzip = deflateSync(serialized)
     console.log('size', serialized.length)
     console.log('deflate size', serializedGzip.length)
+    //console.log({ shortRefCount, longRefCount })
     let parsed
     for (var i = 0; i < ITERATIONS; i++) {
       parsed = parse(serialized)
@@ -328,7 +329,7 @@ suite('serialize', () => {
       parsed.Settings
     }
   })
-  test('performance JSON.stringify', function() {
+  test.only('performance JSON.stringify', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
