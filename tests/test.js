@@ -8,7 +8,7 @@ const inspector = require('inspector')
 const fs = require('fs')
 //inspector.open(9329, null, true)
 const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
-var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
+var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/workflow.json'))
 const ITERATIONS = 1000
 
 suite('serialize', () => {
@@ -148,7 +148,7 @@ suite('serialize', () => {
     assert.deepEqual(parsed, data)
   })
 
-  test('serialize/parse blocks', () => {
+  test.only('serialize/parse blocks', () => {
   	const data = {
       nonBlock: 'just a string',
   		block1: asBlock({ a: 1, name: 'one', type: 'odd', isOdd: true }),
@@ -300,7 +300,7 @@ suite('serialize', () => {
     }
   })
 
-  test.only('performance JSON.parse', function() {
+  test('performance JSON.parse', function() {
   	this.timeout(10000)
   	var data = sampleData
     const serialized = Buffer.from(JSON.stringify(data))
@@ -329,7 +329,7 @@ suite('serialize', () => {
       parsed.Settings
     }
   })
-  test.only('performance JSON.stringify', function() {
+  test('performance JSON.stringify', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
@@ -339,7 +339,7 @@ suite('serialize', () => {
   })
 
 
-  test.only('performance serialize', function() {
+  test('performance serialize', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
