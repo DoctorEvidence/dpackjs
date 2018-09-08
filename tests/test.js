@@ -8,7 +8,7 @@ const inspector = require('inspector')
 const fs = require('fs')
 inspector.open(9329, null, true)
 const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
-var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/workflow.json'))
+var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 const ITERATIONS = 1000
 
 suite('serialize', () => {
@@ -35,6 +35,7 @@ suite('serialize', () => {
   		]
   	}
     const serialized = serialize(data)
+    debugger
     const parsed = parse(serialized)
     assert.deepEqual(parsed, data)
   })
@@ -148,7 +149,7 @@ suite('serialize', () => {
     assert.deepEqual(parsed, data)
   })
 
-  test.only('serialize/parse blocks', () => {
+  test('serialize/parse blocks', () => {
   	const data = {
       nonBlock: 'just a string',
   		block1: asBlock({ a: 1, name: 'one', type: 'odd', isOdd: true }),
@@ -300,7 +301,7 @@ suite('serialize', () => {
     }
   })
 
-  test('performance JSON.parse', function() {
+  test.only('performance JSON.parse', function() {
   	this.timeout(10000)
   	var data = sampleData
     const serialized = Buffer.from(JSON.stringify(data))
@@ -314,11 +315,13 @@ suite('serialize', () => {
     	parsed.Settings
     }
   })
-  test('performance', function() {
+  test.only('performance', function() {
+    debugger
     var data = sampleData
     this.timeout(10000)
     const serialized = serialize(data)
     const serializedGzip = deflateSync(serialized)
+    console.log({ propertyReferences, typeDuplicates, propertyCreations })
     console.log('size', serialized.length)
     console.log('deflate size', serializedGzip.length)
     //console.log({ shortRefCount, longRefCount })
