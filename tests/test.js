@@ -6,13 +6,13 @@ try {
 } catch (error) {}
 const inspector = require('inspector')
 const fs = require('fs')
-inspector.open(9329, null, true)
+//inspector.open(9329, null, true)
 const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 const ITERATIONS = 1000
 
 suite('serialize', () => {
-  test('serialize/parse data', () => {
+  test.only('serialize/parse data', () => {
   	const data = {
   		data: [
   			{ a: 1, name: 'one', type: 'odd', isOdd: true },
@@ -35,12 +35,11 @@ suite('serialize', () => {
   		]
   	}
     const serialized = serialize(data)
-    debugger
     const parsed = parse(serialized)
     assert.deepEqual(parsed, data)
   })
 
-  test('serialize/parse sample data', () => {
+  test.only('serialize/parse sample data', () => {
     const data = sampleData
     const serialized = serialize(data)
     const parsed = parse(serialized)
@@ -316,12 +315,11 @@ suite('serialize', () => {
     }
   })
   test.only('performance', function() {
-    debugger
     var data = sampleData
     this.timeout(10000)
     const serialized = serialize(data)
     const serializedGzip = deflateSync(serialized)
-    console.log({ propertyReferences, typeDuplicates, propertyCreations })
+//    console.log({ propertyReferences, longPropertyReferences, typeDuplicates, propertyCreations, tokens, stringSize, numbers, stringReferences })
     console.log('size', serialized.length)
     console.log('deflate size', serializedGzip.length)
     //console.log({ shortRefCount, longRefCount })
@@ -332,7 +330,7 @@ suite('serialize', () => {
       parsed.Settings
     }
   })
-  test('performance JSON.stringify', function() {
+  test.only('performance JSON.stringify', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
@@ -342,7 +340,7 @@ suite('serialize', () => {
   })
 
 
-  test('performance serialize', function() {
+  test.only('performance serialize', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
