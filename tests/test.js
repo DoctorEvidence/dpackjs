@@ -39,7 +39,7 @@ suite('serialize', () => {
     assert.deepEqual(parsed, data)
   })
 
-  test.only('serialize/parse sample data', () => {
+  test('serialize/parse sample data', () => {
     const data = sampleData
     const serialized = serialize(data)
     const parsed = parse(serialized)
@@ -300,7 +300,7 @@ suite('serialize', () => {
     }
   })
 
-  test.only('performance JSON.parse', function() {
+  test('performance JSON.parse', function() {
   	this.timeout(10000)
   	var data = sampleData
     const serialized = Buffer.from(JSON.stringify(data))
@@ -330,7 +330,7 @@ suite('serialize', () => {
       parsed.Settings
     }
   })
-  test.only('performance JSON.stringify', function() {
+  test('performance JSON.stringify', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
