@@ -300,7 +300,7 @@ suite('serialize', () => {
     }
   })
 
-  test('performance JSON.parse', function() {
+  test.only('performance JSON.parse', function() {
   	this.timeout(10000)
   	var data = sampleData
     const serialized = Buffer.from(JSON.stringify(data))
@@ -330,7 +330,7 @@ suite('serialize', () => {
       parsed.Settings
     }
   })
-  test('performance JSON.stringify', function() {
+  test.only('performance JSON.stringify', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
