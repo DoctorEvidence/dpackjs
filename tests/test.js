@@ -12,7 +12,7 @@ var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 const ITERATIONS = 1000
 
 suite('serialize', () => {
-  test.only('serialize/parse data', () => {
+  test('serialize/parse data', () => {
   	const data = {
   		data: [
   			{ a: 1, name: 'one', type: 'odd', isOdd: true },
@@ -46,7 +46,7 @@ suite('serialize', () => {
     assert.deepEqual(parsed, data)
   })
 
-  test.only('extended class', () => {
+  test('extended class', () => {
     function Extended() {
 
     }
@@ -66,7 +66,7 @@ suite('serialize', () => {
     assert.equal(parsed.extendedInstance.getDouble(), 8)
   })
 
-  test.only('extended class as root', () => {
+  test('extended class as root', () => {
     function Extended() {
 
     }
@@ -82,7 +82,7 @@ suite('serialize', () => {
     assert.equal(parsed.getDouble(), 8)
   })
 
-  test.only('set/map/date', () => {
+  test('set/map/date', () => {
     var map = new Map()
     map.set(4, 'four')
     map.set('three', 3)
@@ -131,7 +131,7 @@ suite('serialize', () => {
     assert.isFalse(parsedSet.has(3))
   })
 
-  test.only('numbers', () => {
+  test('numbers', () => {
     const data = {
       bigEncodable: 48978578104322,
       dateEpoch: 1530886513200,
@@ -149,7 +149,7 @@ suite('serialize', () => {
     assert.deepEqual(parsed, data)
   })
 
-  test.only('serialize/parse blocks', () => {
+  test('serialize/parse blocks', () => {
   	const data = {
       nonBlock: 'just a string',
   		block1: asBlock({ a: 1, name: 'one', type: 'odd', isOdd: true }),
@@ -301,7 +301,7 @@ suite('serialize', () => {
     }
   })
 
-  test.only('performance JSON.parse', function() {
+  test('performance JSON.parse', function() {
   	this.timeout(10000)
   	var data = sampleData
     const serialized = Buffer.from(JSON.stringify(data))
@@ -326,12 +326,13 @@ suite('serialize', () => {
     //console.log({ shortRefCount, longRefCount })
     let parsed
     for (var i = 0; i < ITERATIONS; i++) {
-      parsed = parse(serialized)
+      //parsed = parse(serialized)
+      var str = serialized.toString('utf8', 0, 14000)
       //parsed = parse(uncompressSync(serializedGzip))
-      parsed.Settings
+      //parsed.Settings
     }
   })
-  test.only('performance JSON.stringify', function() {
+  test('performance JSON.stringify', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
@@ -341,7 +342,7 @@ suite('serialize', () => {
   })
 
 
-  test.only('performance serialize', function() {
+  test('performance serialize', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
