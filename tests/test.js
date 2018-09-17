@@ -39,7 +39,7 @@ suite('serialize', () => {
     assert.deepEqual(parsed, data)
   })
 
-  test('serialize/parse sample data', () => {
+  test.only('serialize/parse sample data', () => {
     const data = sampleData
     const serialized = serialize(data)
     const parsed = parse(serialized)
@@ -204,7 +204,7 @@ suite('serialize', () => {
 	  	}, 10)
   	})
   })
-  test.only('serialize/parse stream', () => {
+  test('serialize/parse stream', () => {
     const serializeStream = createSerializeStream({
     })
     const parseStream = createParseStream()
