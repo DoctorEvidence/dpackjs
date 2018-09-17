@@ -12,7 +12,7 @@ var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 const ITERATIONS = 1000
 
 suite('serialize', () => {
-  test('serialize/parse data', () => {
+  test.only('serialize/parse data', () => {
   	const data = {
   		data: [
   			{ a: 1, name: 'one', type: 'odd', isOdd: true },
@@ -204,7 +204,7 @@ suite('serialize', () => {
 	  	}, 10)
   	})
   })
-  test('serialize/parse stream', () => {
+  test.only('serialize/parse stream', () => {
     const serializeStream = createSerializeStream({
     })
     const parseStream = createParseStream()
@@ -301,7 +301,7 @@ suite('serialize', () => {
     }
   })
 
-  test('performance JSON.parse', function() {
+  test.only('performance JSON.parse', function() {
   	this.timeout(10000)
   	var data = sampleData
     const serialized = Buffer.from(JSON.stringify(data))
@@ -310,8 +310,8 @@ suite('serialize', () => {
     console.log('deflate size', serializedGzip.length)
     let parsed
     for (var i = 0; i < ITERATIONS; i++) {
-    	parsed = JSON.parse(serialized)
-    	//parsed = JSON.parse(uncompressSync(serializedGzip))
+    	//parsed = JSON.parse(serialized)
+    	parsed = JSON.parse(inflateSync(serializedGzip))
     	parsed.Settings
     }
   })
@@ -327,27 +327,26 @@ suite('serialize', () => {
     let parsed
     for (var i = 0; i < ITERATIONS; i++) {
       //parsed = parse(serialized)
-      var str = serialized.toString('utf8', 0, 14000)
-      //parsed = parse(uncompressSync(serializedGzip))
-      //parsed.Settings
+      parsed = parse(inflateSync(serializedGzip))
+      parsed.Settings
     }
   })
-  test('performance JSON.stringify', function() {
+  test.only('performance JSON.stringify', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
       const serialized = Buffer.from(JSON.stringify(data))
-      //const serializedGzip = deflateSync(serialized)
+      const serializedGzip = deflateSync(serialized)
     }
   })
 
 
-  test('performance serialize', function() {
+  test.only('performance serialize', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
       const serialized = serialize(data)
-      //const serializedGzip = deflateSync(serialized)
+      const serializedGzip = deflateSync(serialized)
     }
   })
   test.skip('performance encode msgpack-lite', function() {
