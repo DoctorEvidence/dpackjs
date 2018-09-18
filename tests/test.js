@@ -310,8 +310,8 @@ suite('serialize', () => {
     console.log('deflate size', serializedGzip.length)
     let parsed
     for (var i = 0; i < ITERATIONS; i++) {
-    	//parsed = JSON.parse(serialized)
-    	parsed = JSON.parse(inflateSync(serializedGzip))
+    	parsed = JSON.parse(serialized)
+    	//parsed = JSON.parse(inflateSync(serializedGzip))
     	parsed.Settings
     }
   })
@@ -326,8 +326,8 @@ suite('serialize', () => {
     //console.log({ shortRefCount, longRefCount })
     let parsed
     for (var i = 0; i < ITERATIONS; i++) {
-      //parsed = parse(serialized)
-      parsed = parse(inflateSync(serializedGzip))
+      parsed = parse(serialized)
+      //parsed = parse(inflateSync(serializedGzip))
       parsed.Settings
     }
   })
@@ -336,7 +336,7 @@ suite('serialize', () => {
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
       const serialized = Buffer.from(JSON.stringify(data))
-      const serializedGzip = deflateSync(serialized)
+      //const serializedGzip = deflateSync(serialized)
     }
   })
 
@@ -346,7 +346,7 @@ suite('serialize', () => {
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
       const serialized = serialize(data)
-      const serializedGzip = deflateSync(serialized)
+      //const serializedGzip = deflateSync(serialized)
     }
   })
   test.skip('performance encode msgpack-lite', function() {
