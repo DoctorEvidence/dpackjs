@@ -6,13 +6,13 @@ try {
 } catch (error) {}
 const inspector = require('inspector')
 const fs = require('fs')
-//inspector.open(9329, null, true)
+inspector.open(9329, null, true)
 const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 const ITERATIONS = 1000
 
 suite('serialize', () => {
-  test.only('serialize/parse data', () => {
+  test('serialize/parse data', () => {
   	const data = {
   		data: [
   			{ a: 1, name: 'one', type: 'odd', isOdd: true },
@@ -39,7 +39,7 @@ suite('serialize', () => {
     assert.deepEqual(parsed, data)
   })
 
-  test.only('serialize/parse sample data', () => {
+  test('serialize/parse sample data', () => {
     const data = sampleData
     const serialized = serialize(data)
     const parsed = parse(serialized)
@@ -232,7 +232,7 @@ suite('serialize', () => {
       }, 10)
     })
   })
-  test('serialize/parse stream, multiple chunks', () => {
+  test.only('serialize/parse stream, multiple chunks', () => {
     const serializeStream = createSerializeStream({
     })
     const parseStream = createParseStream()
@@ -301,7 +301,7 @@ suite('serialize', () => {
     }
   })
 
-  test.only('performance JSON.parse', function() {
+  test('performance JSON.parse', function() {
   	this.timeout(10000)
   	var data = sampleData
     const serialized = Buffer.from(JSON.stringify(data))
@@ -315,7 +315,7 @@ suite('serialize', () => {
     	parsed.Settings
     }
   })
-  test.only('performance', function() {
+  test('performance', function() {
     var data = sampleData
     this.timeout(10000)
     const serialized = serialize(data)
@@ -331,7 +331,7 @@ suite('serialize', () => {
       parsed.Settings
     }
   })
-  test.only('performance JSON.stringify', function() {
+  test('performance JSON.stringify', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
@@ -341,7 +341,7 @@ suite('serialize', () => {
   })
 
 
-  test.only('performance serialize', function() {
+  test('performance serialize', function() {
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
