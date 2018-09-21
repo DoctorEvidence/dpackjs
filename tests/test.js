@@ -6,7 +6,7 @@ try {
 } catch (error) {}
 const inspector = require('inspector')
 const fs = require('fs')
-inspector.open(9329, null, true)
+//inspector.open(9329, null, true)
 const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 const ITERATIONS = 1000
@@ -223,6 +223,7 @@ suite('serialize', () => {
       name: 'third',
       extra: [1, 3, { foo: 'hi'}, 'bye']
     }]
+    debugger
     for (const message of messages)
       serializeStream.write(message)
     return new Promise((resolve, reject) => {
@@ -232,7 +233,7 @@ suite('serialize', () => {
       }, 10)
     })
   })
-  test.only('serialize/parse stream, multiple chunks', () => {
+  test('serialize/parse stream, multiple chunks', () => {
     const serializeStream = createSerializeStream({
     })
     const parseStream = createParseStream()
