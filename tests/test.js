@@ -58,6 +58,7 @@ suite('serialize', () => {
     const data = {
       extendedInstance: instance
     }
+    // TODO: create two of these
     const options = new Options()
     options.addExtension(Extended)
     const serialized = serialize(data, options)
@@ -222,6 +223,7 @@ suite('serialize', () => {
       name: 'third',
       extra: [1, 3, { foo: 'hi'}, 'bye']
     }]
+    debugger
     for (const message of messages)
       serializeStream.write(message)
     return new Promise((resolve, reject) => {
@@ -310,7 +312,7 @@ suite('serialize', () => {
     let parsed
     for (var i = 0; i < ITERATIONS; i++) {
     	parsed = JSON.parse(serialized)
-    	//parsed = JSON.parse(uncompressSync(serializedGzip))
+    	//parsed = JSON.parse(inflateSync(serializedGzip))
     	parsed.Settings
     }
   })
@@ -319,12 +321,14 @@ suite('serialize', () => {
     this.timeout(10000)
     const serialized = serialize(data)
     const serializedGzip = deflateSync(serialized)
+//    console.log({ propertyReferences, longPropertyReferences, typeDuplicates, propertyCreations, tokens, stringSize, numbers, stringReferences })
     console.log('size', serialized.length)
     console.log('deflate size', serializedGzip.length)
+    //console.log({ shortRefCount, longRefCount })
     let parsed
     for (var i = 0; i < ITERATIONS; i++) {
       parsed = parse(serialized)
-      //parsed = parse(uncompressSync(serializedGzip))
+      //parsed = parse(inflateSync(serializedGzip))
       parsed.Settings
     }
   })
