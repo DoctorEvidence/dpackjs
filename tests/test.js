@@ -321,7 +321,6 @@ suite('serialize', () => {
     this.timeout(10000)
     const serialized = serialize(data)
     const serializedGzip = deflateSync(serialized)
-//    console.log({ propertyReferences, longPropertyReferences, typeDuplicates, propertyCreations, tokens, stringSize, numbers, stringReferences })
     console.log('size', serialized.length)
     console.log('deflate size', serializedGzip.length)
     //console.log({ shortRefCount, longRefCount })
