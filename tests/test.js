@@ -223,7 +223,6 @@ suite('serialize', () => {
       name: 'third',
       extra: [1, 3, { foo: 'hi'}, 'bye']
     }]
-    debugger
     for (const message of messages)
       serializeStream.write(message)
     return new Promise((resolve, reject) => {
