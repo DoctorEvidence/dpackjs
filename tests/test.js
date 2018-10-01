@@ -253,7 +253,7 @@ suite('serialize', () => {
       name: 'third',
       aBlock: asBlock({ name: 'in block' })
     }, {
-      name: 'third',
+      name: 'fourth',
       extra: [1, 3, { foo: 'hi'}, 'bye']
     }]
     for (const message of messages)
