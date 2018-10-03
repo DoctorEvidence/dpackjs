@@ -315,7 +315,7 @@ suite('serialize', () => {
     	parsed.Settings
     }
   })
-  test('performance', function() {
+  test.only('performance', function() {
     var data = sampleData
     this.timeout(10000)
     const serialized = serialize(data)
