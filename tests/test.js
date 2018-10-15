@@ -39,8 +39,7 @@ suite('serialize', () => {
     assert.deepEqual(parsed, data)
   })
 
-  test.only('serialize/parse sample data', () => {
-    debugger
+  test('serialize/parse sample data', () => {
     const data = sampleData
     const serialized = serialize(data)
     const parsed = parse(serialized)
@@ -342,6 +341,7 @@ suite('serialize', () => {
 
 
   test('performance serialize', function() {
+    debugger
     var data = sampleData
     this.timeout(10000)
     for (var i = 0; i < ITERATIONS; i++) {
