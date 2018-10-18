@@ -6,7 +6,7 @@ try {
 } catch (error) {}
 const inspector = require('inspector')
 const fs = require('fs')
-inspector.open(9329, null, true)
+//inspector.open(9329, null, true)
 const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 const ITERATIONS = 1000
@@ -149,7 +149,7 @@ suite('serialize', () => {
     assert.deepEqual(parsed, data)
   })
 
-  test.only('serialize/parse blocks', () => {
+  test('serialize/parse blocks', () => {
   	const data = {
       nonBlock: 'just a string',
   		block1: asBlock({ a: 1, name: 'one', type: 'odd', isOdd: true }),
@@ -161,7 +161,6 @@ suite('serialize', () => {
       ]
   	}
     const serialized = serialize(data)
-    debugger
     const parsed = parseLazy(serialized)
     assert.deepEqual(parsed, data)
   })
