@@ -161,6 +161,21 @@ suite('serialize', () => {
       ]
   	}
     const serialized = serialize(data)
+    const parsed = parse(serialized)
+    assert.deepEqual(parsed, data)
+  })
+  test('serialize/parse blocks lazily', () => {
+    const data = {
+      nonBlock: 'just a string',
+      block1: asBlock({ a: 1, name: 'one', type: 'odd', isOdd: true }),
+      block2: asBlock({ a: 2, name: 'two', type: 'even'}),
+      arrayOfBlocks : [
+        asBlock({ a: 3, name: 'three', type: 'odd', isOdd: true }),
+        asBlock({ a: 4, name: 'four', type: 'even'}),
+        asBlock({ a: 5, name: 'five', type: 'odd', isOdd: true })
+      ]
+    }
+    const serialized = serialize(data)
     const parsed = parseLazy(serialized)
     assert.deepEqual(parsed, data)
   })
