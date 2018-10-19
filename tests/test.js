@@ -359,7 +359,6 @@ suite('serialize', () => {
 
 
 	test('performance serialize', function() {
-		debugger
 		var data = sampleData
 		this.timeout(10000)
 		for (var i = 0; i < ITERATIONS; i++) {
