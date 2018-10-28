@@ -6,7 +6,7 @@ try {
 } catch (error) {}
 const inspector = require('inspector')
 const fs = require('fs')
-inspector.open(9329, null, true)
+//inspector.open(9329, null, true)
 const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 const ITERATIONS = 1000
@@ -163,10 +163,10 @@ suite('serialize', () => {
 		}
 		const serialized = serialize(data)
 		const parsed = parse(serialized)
+		data.blockOfArray = [{ a: 2.5, name: 'two point five', type: 'decimal'}] // expect a true array
 		assert.deepEqual(parsed, data)
 	})
-	test.only('serialize/parse block of array', () => {
-		debugger
+	test('serialize/parse block of array', () => {
 		const data = [
 			'just a string',
 			asBlock({ a: 1, name: 'one', type: 'odd', isOdd: true }),
