@@ -10,3 +10,4 @@ exports.parseLazy = parse.parseLazy
 exports.asBlock = require('./lib/Block').asBlock
 exports.Options = Options
 exports.fetch = require('./fetch').fetch
+exports.XMLHttpRequest = require('./xhr').XMLHttpRequest
