@@ -11,25 +11,27 @@ function readResponse(response, onProgress) {
 		var parsedData
 		var queuedBytes
 		function queueUnfinishedChar(bytes) {
-			var length = array.length
+			// this checks to see if we end the bytes in the middle of a character, and need to queue bytes for the next chunk
+			var length = bytes.length
 			var lastStart = length - 1
-			if (array[lastStart] < 0x80) {
+			if (bytes[lastStart] < 0x80) {
 				queuedBytes = null
 				return bytes
 			}
 			while (lastStart >= 0) {
-				var byte = array[lastStart]
+				var byte = bytes[lastStart]
 				if (byte >= 0xC0) {
 					var charLength = byte >= 0xE0 ? byte >= 0xF0 ? 4 : 3 : 2
 					var needs = charLength - length + lastStart
 					if (needs > 0) {
-						queuedBytes = array.slice(lastStart, length - lastStart)
+						queuedBytes = bytes.slice(lastStart, length - lastStart)
 						queuedBytes.needs = needs
 						return bytes.slice(0, lastStart)
 					}
 					queuedBytes = null
 					return bytes
 				}
+				lastStart--
 			}
 			queuedBytes = null
 			return bytes
@@ -42,7 +44,9 @@ function readResponse(response, onProgress) {
 				} else {
 					var bytes = next.value
 					if (queuedBytes) {
-						sourceText += decoder.decode(queuedBytes.concat(bytes.slice(0, queuedBytes.needs)))
+						// if we are resuming from the middle of a character, concatenate the bytes and decode it
+						sourceText += decoder.decode(new Uint8Array(Array.from(queuedBytes).concat(Array.from(bytes.slice(0, queuedBytes.needs)))))
+						// and then remove the consumed byte(s)
 						bytes = bytes.slice(queuedBytes.needs)
 					}
 					bytes = queueUnfinishedChar(bytes)
