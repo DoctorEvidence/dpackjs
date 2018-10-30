@@ -9,12 +9,45 @@ function readResponse(response, onProgress) {
 		var sourceText = ''
 		var parser
 		var parsedData
+		var queuedBytes
+		function queueUnfinishedChar(bytes) {
+			var length = array.length
+			var lastStart = length - 1
+			if (array[lastStart] < 0x80) {
+				queuedBytes = null
+				return bytes
+			}
+			while (lastStart >= 0) {
+				var byte = array[lastStart]
+				if (byte >= 0xC0) {
+					var charLength = byte >= 0xE0 ? byte >= 0xF0 ? 4 : 3 : 2
+					var needs = charLength - length + lastStart
+					if (needs > 0) {
+						queuedBytes = array.slice(lastStart, length - lastStart)
+						queuedBytes.needs = needs
+						return bytes.slice(0, lastStart)
+					}
+					queuedBytes = null
+					return bytes
+				}
+			}
+			queuedBytes = null
+			return bytes
+		}
+		var decoder = new TextDecoder()
 		function readNext() {
 			reader.read().then(function(next) {
 				if (next.done) {
 					resolve(parsedData)
 				} else {
-					sourceText += new TextDecoder().decode(next.value)
+					var bytes = next.value
+					if (queuedBytes) {
+						sourceText += decoder.decode(queuedBytes.concat(bytes.slice(0, queuedBytes.needs)))
+						bytes = bytes.slice(queuedBytes.needs)
+					}
+					bytes = queueUnfinishedChar(bytes)
+
+					sourceText += decoder.decode(bytes)
 					try {
 						if (parser) {
 							if (parser.onResume) {
