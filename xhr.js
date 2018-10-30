@@ -8,9 +8,16 @@ exports.XMLHttpRequest = function() {
 	var responseRejected
    	var requestResolved
 	xhr.addEventListener('progress', receivedData)
-	xhr.open = function() {
-		XMLHttpRequest.prototype.open.apply(this, arguments)
-		this.setRequestHeader('Accept', 'text/dpack;q=1,application/json;q=0.7')
+	var acceptSet
+	xhr.setRequestHeader = function(name, value) {
+		if (name.toLowerCase() == 'accept')
+			acceptSet = true
+		return XMLHttpRequest.prototype.setRequestHeader.call(this, name, value)
+	}
+	xhr.send = function() {
+		if (!acceptSet)
+			this.setRequestHeader('Accept', 'text/dpack;q=1,application/json;q=0.7')
+		XMLHttpRequest.prototype.send.apply(this, arguments)
 	}
 
 	function receivedData(event) {
