@@ -17,7 +17,7 @@ In addition this dpack library features:
 
 DPack is designed for very compact serialization and fast parsing with a wide range of types and encodings to support a broad range of applications, including efficient database storage, and efficient network data transfer. However, there are some caveats to consider. DPack leverage reuse of data property definitions to acheive its compact format. For very small data structures, or data structures with very little structural consistency, dpack's advantages may be minimized or non-existent. However, for applications with larger data structures with internal consistency, with the entire process of serialization, compression, caching, network transfer, decoding, and progressive parsing taken into consideration, dpack can provide substantial performance benefits.
 
-# Using dpack
+# Using DPack
 
 To use dpack, install it:
 ```
