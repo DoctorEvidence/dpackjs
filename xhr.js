@@ -9,15 +9,17 @@ exports.XMLHttpRequest = function() {
    	var requestResolved
 	xhr.addEventListener('progress', receivedData)
 	var acceptSet
+	var originalSetRequestHeader = xhr.setRequestHeader
 	xhr.setRequestHeader = function(name, value) {
 		if (name.toLowerCase() == 'accept')
 			acceptSet = true
-		return XMLHttpRequest.prototype.setRequestHeader.call(this, name, value)
+		return originalSetRequestHeader.call(this, name, value)
 	}
+	var originalSend = xhr.send
 	xhr.send = function() {
 		if (!acceptSet)
 			this.setRequestHeader('Accept', 'text/dpack;q=1,application/json;q=0.7')
-		XMLHttpRequest.prototype.send.apply(this, arguments)
+		originalSend.apply(this, arguments)
 	}
 
 	function receivedData(event) {
