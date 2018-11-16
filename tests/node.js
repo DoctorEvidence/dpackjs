@@ -15,6 +15,7 @@ suite('dpack node tests', () => {
 			arrayOfBlocks : [
 				asBlock({ a: 3, name: 'three', type: 'odd', isOdd: true }),
 				asBlock({ a: 4, name: 'four', type: 'even'}),
+				{ a: 4.5, name: 'not a block'},
 				asBlock({ a: 5, name: 'five', type: 'odd', isOdd: true })
 			]
 		}
@@ -141,6 +142,13 @@ suite('dpack node tests', () => {
 		}, {
 			name: 'fourth',
 			extra: [1, 3, { foo: 'hi'}, 'bye']
+		}, {
+			name: 'fifth',
+			blocks: [
+				asBlock({ name: 'block 1' }),
+				{ name: 'not a block' },
+				asBlock({ name: 'block 2' })
+			]
 		}]
 		for (const message of messages)
 			serializeStream.write(message)
