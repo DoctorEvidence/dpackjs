@@ -73,6 +73,10 @@ suite('dpack basic tests', function(){
 		assert.deepEqual(parsed, data)
 	})
 
+	test('write function', function() {
+		serialize({ test: function() { console.log('just do not error') }})
+	})
+
 	test('extended class', function(){
 		function Extended() {
 
