@@ -217,7 +217,7 @@ suite('dpack basic tests', function(){
 		}
 	})
 
-	test('performance JSON.parse', function() {
+	test.only('performance JSON.parse', function() {
 		this.timeout(10000)
 		var data = sampleData
 		var serialized = typeof Buffer === 'undefined' ? JSON.stringify(data) : Buffer.from(JSON.stringify(data))
@@ -231,7 +231,7 @@ suite('dpack basic tests', function(){
 			parsed.Settings
 		}
 	})
-	test('performance', function() {
+	test.only('performance', function() {
 		var data = sampleData
 		this.timeout(10000)
 		var serialized = serialize(data)
