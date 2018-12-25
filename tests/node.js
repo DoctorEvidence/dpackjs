@@ -1,12 +1,12 @@
 const { assert } = require('chai')
 const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
 const fs = require('fs')
-var inspector = require('inspector')
-inspector.open(9329, null, true)
+//var inspector = require('inspector')
+//inspector.open(9329, null, true)
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 
-suite('dpack node tests', () => {
-	test.only('serialize/parse blocks', () => {
+suite.skip('dpack node tests', () => {
+	test('serialize/parse blocks', () => {
 		const data = {
 			nonBlock: 'just a string',
 			block1: asBlock({ a: 1, name: 'one', type: 'odd', isOdd: true }),
@@ -20,7 +20,6 @@ suite('dpack node tests', () => {
 			]
 		}
 		const serialized = serialize(data)
-		debugger
 		const parsed = parse(serialized)
 		data.blockOfArray = [{ a: 2.5, name: 'two point five', type: 'decimal'}] // expect a true array
 		assert.deepEqual(parsed, data)
