@@ -5,7 +5,7 @@ const fs = require('fs')
 //inspector.open(9329, null, true)
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 
-suite.skip('dpack node tests', () => {
+suite('dpack node tests', () => {
 	test('serialize/parse blocks', () => {
 		const data = {
 			nonBlock: 'just a string',
@@ -32,7 +32,6 @@ suite.skip('dpack node tests', () => {
 		]
 		const serialized = serialize(data)
 		const parsed = parse(serialized)
-		data.blockOfArray = [{ a: 2.5, name: 'two point five', type: 'decimal'}] // expect a true array
 		assert.deepEqual(parsed, data)
 	})
 	test('serialize/parse blocks lazily', () => {
