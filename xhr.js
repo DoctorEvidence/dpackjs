@@ -10,6 +10,7 @@ exports.XMLHttpRequest = function() {
 	xhr.addEventListener('progress', receivedData)
 	var acceptSet
 	var originalSetRequestHeader = xhr.setRequestHeader
+	var lastOffset = 0
 	xhr.setRequestHeader = function(name, value) {
 		if (name.toLowerCase() == 'accept')
 			acceptSet = true
@@ -24,39 +25,35 @@ exports.XMLHttpRequest = function() {
 
 	function receivedData(event) {
 		var sourceText = xhr.responseText
-		try {
+//		try {
 			if (parser) {
 				if (parser.onResume) {
-					var updatedData = parser.onResume(sourceText)
+					var updatedData = parser.onResume(sourceText.slice(lastOffset), true, true)
 					xhr.responseParsed = xhr.responseParsed || updatedData
 				}
 			} else {
 				if (sourceText && /dpack/.test(xhr.getResponseHeader('Content-Type'))) {
 					parser = createParser()
-					parser.setSource(sourceText)
+					parser.setSource(sourceText, 0, true)
 					xhr.responseParsed = parser.read()
 				}
 				else
 					return
 			}
-			parser.read()
-		} catch (error) {
-			onError(error)
-		}
-	}
-	function onError(error) {
-		if (error.message == 'Unexpected end of dpack stream') {
-			xhr.responseParsed = xhr.responseParsed || error.valueInProgress
-		} else {
+			lastOffset = sourceText.length
+/*		} catch (error) {
 			if (xhr.onerror) {
 				xhr.onerror(error)
 			} else {
 				throw error
 			}
-		}
+		}*/
 	}
 	xhr.addEventListener('load', function(event) {
 		receivedData()
+		if (parser && parser.isPaused()) {
+			throw new Error('Unexpected end of dpack stream')
+		}
 	})
 	return xhr
 }

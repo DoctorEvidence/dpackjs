@@ -6,7 +6,6 @@ var serialize = window.serialize = require('./lib/serialize').serialize
 function readResponse(response, onProgress) {
 	var reader = response.body.getReader()
 	return new Promise(function(resolve, reject) {
-		var sourceText = ''
 		var parser
 		var parsedData
 		var queuedBytes
@@ -43,30 +42,29 @@ function readResponse(response, onProgress) {
 					resolve(parsedData)
 				} else {
 					var bytes = next.value
+					var sourceText
 					if (queuedBytes) {
 						// if we are resuming from the middle of a character, concatenate the bytes and decode it
-						sourceText += decoder.decode(new Uint8Array(Array.from(queuedBytes).concat(Array.from(bytes.slice(0, queuedBytes.needs)))))
+						sourceText = decoder.decode(new Uint8Array(Array.from(queuedBytes).concat(Array.from(bytes.slice(0, queuedBytes.needs)))))
 						// and then remove the consumed byte(s)
 						bytes = bytes.slice(queuedBytes.needs)
+						bytes = queueUnfinishedChar(bytes)
+						sourceText += decoder.decode(bytes)
+					} else {
+						bytes = queueUnfinishedChar(bytes)
+						sourceText = decoder.decode(bytes)
 					}
-					bytes = queueUnfinishedChar(bytes)
-
-					sourceText += decoder.decode(bytes)
-					try {
-						if (parser) {
-							if (parser.onResume) {
-								var updatedData = parser.onResume(sourceText)
-								parsedData = parsedData || updatedData
-							}
-						} else {
-							parser = createParser()
-							parser.setSource(sourceText)
-							parsedData = parser.read()
+					if (parser) {
+						if (parser.onResume) {
+							var updatedData = parser.onResume(sourceText, true)
+							parsedData = parsedData || updatedData
 						}
-						parser.read()
-					} catch (error) {
-						onError(error)
+					} else {
+						parser = createParser()
+						parser.setSource(sourceText, 0, true)
+						parsedData = parser.read()
 					}
+					parser.read()
 					readNext()
 				}
 			})
