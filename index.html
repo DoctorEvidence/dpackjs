@@ -29,35 +29,11 @@
       </div>
       <div class="json-area">
         <h3>JSON</h3>
-        <textarea id="json">[
-  {
-    "feature": "Referencing/reuse of properties and values",
-    "benefit": "Compact representation, fast parsing"
-  },
-  {
-    "feature": "Valid unicode format",
-    "benefit": "Fast single-pass text decoding, broad support"
-  },
-  {
-    "feature": "Extensible types",
-    "benefit": "Beyond objects and arrays, support for maps, sets, dates, and user-defined types"
-  },
-  {
-    "feature": "Byte-length blocks",
-    "benefit": "Support for on-demand parsing of properties/sub-objects"
-  },
-  {
-    "feature": "Referencing values",
-    "benefit": "Represent complex graph-like and circular structures"
-  },
-  {
-    "feature": "Streaming, progressive parsing",
-    "benefit": "Data parsed during download, for in progress data access and concurrency"
-  }
-]</textarea>
+        <textarea id="json"></textarea>
         <div id="json-stats"></div>
       </div>
     </section>
+    <div class='devtools-instructions'>View and modify parsed data in devtools through global variable <code>data</code>, and serialize it with global function <code>serialize()</code></div>
     <script src="dist/index.js"></script>
     <script src="interactive.js"></script>
   </body>

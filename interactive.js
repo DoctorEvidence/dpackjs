@@ -11,8 +11,37 @@ document.getElementById('convert-to-dpack').onclick = function() {
 
 serialize = function() {
 	dpackText.value = dpack.serialize(data)
+	jsonText.value = JSON.stringify(data, null, '  ')
+	updateStats()
 }
 function updateStats() {
 	document.getElementById('json-stats').textContent = new TextEncoder().encode(JSON.stringify(data)).length + ' bytes (without indentation)'
 	document.getElementById('dpack-stats').textContent = new TextEncoder().encode(dpack.serialize(data)).length + ' bytes'
 }
+data = [
+  {
+    "feature": "Referencing/reuse of properties and values",
+    "benefit": "Compact representation, fast parsing"
+  },
+  {
+    "feature": "Valid unicode format",
+    "benefit": "Fast single-pass text decoding, broad support"
+  },
+  {
+    "feature": "Extensible types",
+    "benefit": "Beyond objects and arrays, support for maps, sets, dates, and user-defined types"
+  },
+  {
+    "feature": "Byte-length blocks",
+    "benefit": "Support for on-demand parsing of properties/sub-objects"
+  },
+  {
+    "feature": "Referencing values",
+    "benefit": "Represent complex graph-like and circular structures"
+  },
+  {
+    "feature": "Streaming, progressive parsing",
+    "benefit": "Data parsed during download, for in progress data access and concurrency"
+  }
+]
+serialize()

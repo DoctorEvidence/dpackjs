@@ -313,7 +313,7 @@ label {
 .main-content {
   position: absolute;
   top: 350px;
-  bottom: 0px;
+  bottom: 30px;
   left: 0;
   right: 0;
 }
@@ -338,4 +338,11 @@ label {
   right: 45%;
   top: 0;
   bottom: 0;
+}
+.devtools-instructions {
+  position: absolute;
+  height: 60px;
+  bottom: 0px;
+  left: 30px;
+  right: 0;
 }
