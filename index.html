@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>DPack - A modern binary data format for the web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">DPack</h1>
+      <h2 class="project-tagline">Compact, fast, flexible, and expressive.</h2>
+      <a href="https://github.com/DoctorEvidence/dpack" class="btn">View Specification</a>
+      <a href="https://github.com/DoctorEvidence/dpackjs" class="btn">View on GitHub</a>
+    </section>
+
+    <section class="main-content">
+      <div class="dpack-area">
+        <h3>DPack</h3>
+        <textarea id="dpack"></textarea>
+        <div id="dpack-stats"></div>
+      </div>
+      <div class="actions">
+        <button id="convert-to-dpack"><<< Convert to dpack</button>
+        <button id="convert-to-json">Convert to JSON >>></button>
+      </div>
+      <div class="json-area">
+        <h3>JSON</h3>
+        <textarea id="json">[
+  {
+    "feature": "Referencing/reuse of properties and values",
+    "benefit": "Compact representation, fast parsing"
+  },
+  {
+    "feature": "Valid unicode format",
+    "benefit": "Fast single-pass text decoding, broad support"
+  },
+  {
+    "feature": "Extensible types",
+    "benefit": "Beyond objects and arrays, support for maps, sets, dates, and user-defined types"
+  },
+  {
+    "feature": "Byte-length blocks",
+    "benefit": "Support for on-demand parsing of properties/sub-objects"
+  },
+  {
+    "feature": "Referencing values",
+    "benefit": "Represent complex graph-like and circular structures"
+  },
+  {
+    "feature": "Streaming, progressive parsing",
+    "benefit": "Data parsed during download, for in progress data access and concurrency"
+  }
+]</textarea>
+        <div id="json-stats"></div>
+      </div>
+    </section>
+    <script src="dist/index.js"></script>
+    <script src="interactive.js"></script>
+  </body>
+</html>
