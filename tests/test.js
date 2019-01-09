@@ -16,7 +16,7 @@ var snappy = tryRequire('snappy')
 var compressSync = snappy.compressSync
 var uncompressSync = snappy.uncompressSync
 try {
-	//var { decode, encode } = require('msgpack-lite')
+	var { decode, encode } = require('msgpack-lite')
 } catch (error) {}
 
 if (typeof XMLHttpRequest === 'undefined') {
@@ -202,7 +202,7 @@ suite('dpack basic tests', function(){
 		assert.isTrue(typeof data.Data == 'object')
 	})
 
-	test.skip('performance msgpack-lite', function() {
+	test('performance msgpack-lite', function() {
 		var data = sampleData
 		this.timeout(10000)
 		var serialized = encode(data)
@@ -221,9 +221,9 @@ suite('dpack basic tests', function(){
 		this.timeout(10000)
 		var data = sampleData
 		var serialized = typeof Buffer === 'undefined' ? JSON.stringify(data) : Buffer.from(JSON.stringify(data))
-		//var serializedGzip = deflateSync(serialized)
+		var serializedGzip = deflateSync(serialized)
 		console.log('size', serialized.length)
-		//console.log('deflate size', serializedGzip.length)
+		console.log('deflate size', serializedGzip.length)
 		var parsed
 		for (var i = 0; i < ITERATIONS; i++) {
 			parsed = JSON.parse(serialized)
@@ -235,13 +235,38 @@ suite('dpack basic tests', function(){
 		var data = sampleData
 		this.timeout(10000)
 		var serialized = serialize(data)
-		//var serializedGzip = deflateSync(serialized)
+		var serializedGzip = deflateSync(serialized)
 		console.log('size', serialized.length)
-		//console.log('deflate size', serializedGzip.length)
+		console.log('deflate size', serializedGzip.length)
 		//console.log({ shortRefCount, longRefCount })
 		var parsed
 		for (var i = 0; i < ITERATIONS; i++) {
 			parsed = parse(serialized)
+			//parsed = parse(inflateSync(serializedGzip))
+			parsed.Settings
+		}
+	})
+	test('performance V8 serialize', function() {
+		var v8 = require('v8')
+		var data = sampleData
+		this.timeout(10000)
+		for (var i = 0; i < ITERATIONS; i++) {
+			var serialized = v8.serialize(data)
+			//var serializedGzip = deflateSync(serialized)
+		}
+	})
+	test('performance V8 deserialize', function() {
+		var v8 = require('v8')
+		var data = sampleData
+		this.timeout(10000)
+		var serialized = v8.serialize(data)
+		var serializedGzip = deflateSync(serialized)
+		console.log('size', serialized.length)
+		console.log('deflate size', serializedGzip.length)
+		//console.log({ shortRefCount, longRefCount })
+		var parsed
+		for (var i = 0; i < ITERATIONS; i++) {
+			parsed = v8.deserialize(serialized)
 			//parsed = parse(inflateSync(serializedGzip))
 			parsed.Settings
 		}
@@ -264,7 +289,7 @@ suite('dpack basic tests', function(){
 			//var serializedGzip = deflateSync(serialized)
 		}
 	})
-	test.skip('performance encode msgpack-lite', function() {
+	test('performance encode msgpack-lite', function() {
 		var data = sampleData
 		this.timeout(10000)
 		for (var i = 0; i < ITERATIONS; i++) {
