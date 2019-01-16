@@ -4,7 +4,7 @@ DPack is a very compact binary format for serializing data structures, designed 
 * Uses internal referencing and reuse of properties, values, and objects for very compact serialization and fast parsing.
 * Defined as a valid unicode character string, which allows for single-pass text decoding for faster and simpler decoding (particulary in browser), support across older browsers, and ease of manipulation as a character string. It can also be encoded in UTF-8, UTF-16, or any ASCII compatible encoding.
 * Supports a wide range of types including strings, decimal-based numbers, booleans, objects, arrays, dates, maps, sets, and user-provided classes/types.
-* Supports positionally mapped object properties for lazy evaluation of paths for faster access to data without parsing entire data structures (useful for efficient and scalable storing, querying, and indexing data in databases).
+* Supports byte-length mapped object properties for lazy evaluation of paths for faster access to data without parsing entire data structures (useful for efficient and scalable storing, querying, and indexing data in databases).
 * Supports referencing of objects and values which can be used advanced serialization and reuse of objects.
 * Optimized to compress well with Huffman/Gzip encoding schemes.
 
