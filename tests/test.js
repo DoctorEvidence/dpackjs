@@ -39,7 +39,7 @@ var Options = dpack.Options
 var ITERATIONS = 1000
 
 suite('dpack basic tests', function(){
-	test('serialize/parse data', function(){
+	test.only('serialize/parse data', function(){
 		var data = {
 			data: [
 				{ a: 1, name: 'one', type: 'odd', isOdd: true },
@@ -61,6 +61,7 @@ suite('dpack basic tests', function(){
 				{ prop: null }
 			]
 		}
+		debugger
 		var serialized = serialize(data)
 		var parsed = parse(serialized)
 		assert.deepEqual(parsed, data)
@@ -231,7 +232,7 @@ suite('dpack basic tests', function(){
 			parsed.Settings
 		}
 	})
-	test('performance', function() {
+	test.only('performance', function() {
 		var data = sampleData
 		this.timeout(10000)
 		var serialized = serialize(data)
