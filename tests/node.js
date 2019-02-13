@@ -1,7 +1,7 @@
 const { assert } = require('chai')
 const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
 const fs = require('fs')
-//var inspector = require('inspector')
+var inspector = require('inspector')
 //inspector.open(9329, null, true)
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 
