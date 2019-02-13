@@ -67,7 +67,7 @@ suite('dpack basic tests', function(){
 		assert.deepEqual(parsed, data)
 	})
 
-	test('serialize/parse sample data', function(){
+	test.only('serialize/parse sample data', function(){
 		var data = sampleData
 		var serialized = serialize(data)
 		var parsed = parse(serialized)
@@ -218,7 +218,7 @@ suite('dpack basic tests', function(){
 		}
 	})
 
-	test('performance JSON.parse', function() {
+	test.only('performance JSON.parse', function() {
 		this.timeout(10000)
 		var data = sampleData
 		var serialized = typeof Buffer === 'undefined' ? JSON.stringify(data) : Buffer.from(JSON.stringify(data))
@@ -272,7 +272,7 @@ suite('dpack basic tests', function(){
 			parsed.Settings
 		}
 	})
-	test('performance JSON.stringify', function() {
+	test.only('performance JSON.stringify', function() {
 		var data = sampleData
 		this.timeout(10000)
 		for (var i = 0; i < ITERATIONS; i++) {
@@ -282,7 +282,7 @@ suite('dpack basic tests', function(){
 	})
 
 
-	test('performance serialize', function() {
+	test.only('performance serialize', function() {
 		var data = sampleData
 		this.timeout(10000)
 		for (var i = 0; i < ITERATIONS; i++) {
