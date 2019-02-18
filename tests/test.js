@@ -77,7 +77,7 @@ suite('dpack basic tests', function(){
 		serialize({ test: function() { console.log('just do not error') }})
 	})
 
-	test('extended class', function(){
+	test.only('extended class', function(){
 		function Extended() {
 
 		}
