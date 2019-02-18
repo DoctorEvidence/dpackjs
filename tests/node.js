@@ -34,7 +34,7 @@ suite('dpack node tests', () => {
 		const parsed = parse(serialized)
 		assert.deepEqual(parsed, data)
 	})
-	test.only('serialize/parse blocks lazily', () => {
+	test('serialize/parse blocks lazily', () => {
 		const data = asBlock({
 			nonBlock: 'just a string',
 			block1: asBlock({ a: 1, name: 'one', type: 'odd', isOdd: true }),
