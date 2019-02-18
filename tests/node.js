@@ -1,8 +1,8 @@
 const { assert } = require('chai')
-const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options } = require('..')
+const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options, getLazyHeader } = require('..')
 const fs = require('fs')
 var inspector = require('inspector')
-//inspector.open(9329, null, true)
+inspector.open(9329, null, true)
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 
 suite('dpack node tests', () => {
@@ -34,8 +34,8 @@ suite('dpack node tests', () => {
 		const parsed = parse(serialized)
 		assert.deepEqual(parsed, data)
 	})
-	test('serialize/parse blocks lazily', () => {
-		const data = {
+	test.only('serialize/parse blocks lazily', () => {
+		const data = asBlock({
 			nonBlock: 'just a string',
 			block1: asBlock({ a: 1, name: 'one', type: 'odd', isOdd: true }),
 			block2: asBlock({ a: 2, name: 'two', type: 'even'}),
@@ -45,8 +45,9 @@ suite('dpack node tests', () => {
 				asBlock({ a: 4, name: 'four', type: 'even'}),
 				asBlock({ a: 5, name: 'five', type: 'odd', isOdd: true })
 			]
-		}
-		const serialized = serialize(data)
+		})
+		const serialized = serialize(data, { lazy: true })
+		debugger
 		const parsed = parseLazy(serialized)
 		assert.deepEqual(parsed, data)
 	})
