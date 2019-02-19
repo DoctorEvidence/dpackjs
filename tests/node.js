@@ -47,7 +47,6 @@ suite('dpack node tests', () => {
 			]
 		})
 		const serialized = serialize(data, { lazy: true })
-		debugger
 		const parsed = parseLazy(serialized)
 		assert.deepEqual(parsed, data)
 	})
@@ -119,7 +118,7 @@ suite('dpack node tests', () => {
 			}, 10)
 		})
 	})
-	test('serialize/parse stream, multiple chunks', () => {
+	test.only('serialize/parse stream, multiple chunks', () => {
 		const serializeStream = createSerializeStream({
 		})
 		const parseStream = createParseStream()
