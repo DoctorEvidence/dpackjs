@@ -16,5 +16,5 @@ exports.createParser = parse.createParser
 exports.parseLazy = parse.parseLazy
 const Block = require('./lib/Block')
 exports.asBlock = Block.asBlock
-exports.getLazyHeader = Block.getLazyHeader
+exports.copy = Block.copy
 exports.Options = Options
