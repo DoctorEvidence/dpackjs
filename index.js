@@ -16,5 +16,6 @@ exports.createParser = parse.createParser
 exports.parseLazy = parse.parseLazy
 const Block = require('./lib/Block')
 exports.asBlock = Block.asBlock
+exports.isBlock = Block.isBlock
 exports.copy = Block.copy
 exports.Options = Options

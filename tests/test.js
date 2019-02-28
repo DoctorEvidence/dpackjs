@@ -66,7 +66,24 @@ suite('dpack basic tests', function(){
 		assert.deepEqual(parsed, data)
 	})
 
-	test('serialize/parse sample data', function(){
+	test('mixed array', function(){
+		var data = [
+			'one',
+			'two',
+			'one',
+			10,
+			11,
+			null,
+			true,
+			'three',
+			'one'
+		]
+		var serialized = serialize(data)
+		var parsed = parse(serialized)
+		assert.deepEqual(parsed, data)
+	})
+
+	test.only('serialize/parse sample data', function(){
 		var data = sampleData
 		var serialized = serialize(data)
 		var parsed = parse(serialized)
