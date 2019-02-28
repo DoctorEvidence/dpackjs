@@ -1,5 +1,5 @@
 const { assert } = require('chai')
-const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, Options, getLazyHeader } = require('..')
+const { serialize, parse, parseLazy, createParseStream, createSerializeStream, asBlock, copy, Options, getLazyHeader } = require('..')
 const fs = require('fs')
 var inspector = require('inspector')
 //inspector.open(9329, null, true)
@@ -44,12 +44,55 @@ suite('dpack node tests', () => {
 				asBlock({ a: 3, name: 'three', type: 'odd', isOdd: true }),
 				asBlock({ a: 4, name: 'four', type: 'even'}),
 				asBlock({ a: 5, name: 'five', type: 'odd', isOdd: true })
-			]
+			],
+			nested: asBlock({ a: 10, name: 'ten', type: 'even', child: asBlock({
+				a: 11, name: 'ten plus one'
+			})}),
 		})
 		const serialized = serialize(data, { lazy: true })
 		const parsed = parseLazy(serialized)
 		assert.deepEqual(parsed, data)
 	})
+
+	test('serialize/parse copy-on-write blocks', () => {
+		const data = asBlock({
+			nonBlock: 'just a string',
+			block1: asBlock({ a: 1, name: 'one', type: 'odd', isOdd: true }),
+			block2: asBlock({ a: 2, name: 'two', type: 'even'}),
+			blockOfArray: asBlock([{ a: 2.5, name: 'two point five', type: 'decimal'}]),
+			arrayOfBlocks : [
+				asBlock({ a: 3, name: 'three', type: 'odd', isOdd: true }),
+				asBlock({ a: 4, name: 'four', type: 'even'}),
+				asBlock({ a: 5, name: 'five', type: 'odd', isOdd: true })
+			],
+			nested: asBlock({ a: 10, name: 'ten', type: 'even', child: asBlock({
+				a: 11, name: 'ten plus one'
+			})}),
+		})
+		let serialized = serialize(data, { lazy: true })
+		const copied = copy(data)
+		copied.nested.child.name = 'ten plus one changed'
+		const newBlock2 = copied.block2 = asBlock({ a: 2, name: 'two changed', type: 'even'})
+		serialized = serialize(copied, { lazy: true })
+		const parsed = parseLazy(serialized)
+		const expected = {
+			nonBlock: 'just a string',
+			block1: { a: 1, name: 'one', type: 'odd', isOdd: true },
+			block2: { a: 2, name: 'two changed', type: 'even'},
+			blockOfArray: {
+				0: { a: 2.5, name: 'two point five', type: 'decimal'}
+			},
+			arrayOfBlocks : [
+				{ a: 3, name: 'three', type: 'odd', isOdd: true },
+				{ a: 4, name: 'four', type: 'even'},
+				{ a: 5, name: 'five', type: 'odd', isOdd: true }
+			],
+			nested: { a: 10, name: 'ten', type: 'even', child: {
+				a: 11, name: 'ten plus one changed'
+			}},
+		}
+		assert.deepEqual(parsed, expected)
+	})	
 
 	test('serialize/parse stream with promise', () => {
 		const serializeStream = createSerializeStream({
