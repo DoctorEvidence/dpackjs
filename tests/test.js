@@ -83,7 +83,7 @@ suite('dpack basic tests', function(){
 		assert.deepEqual(parsed, data)
 	})
 
-	test.only('serialize/parse sample data', function(){
+	test('serialize/parse sample data', function(){
 		var data = sampleData
 		var serialized = serialize(data)
 		var parsed = parse(serialized)
