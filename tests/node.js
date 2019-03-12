@@ -21,7 +21,7 @@ suite('dpack node tests', () => {
 		}
 		const serialized = serialize(data)
 		const parsed = parse(serialized)
-		//data.blockOfArray = [{ a: 2.5, name: 'two point five', type: 'decimal'}] // expect a true array
+		data.blockOfArray = [{ a: 2.5, name: 'two point five', type: 'decimal'}] // expect a true array
 		assert.deepEqual(parsed, data)
 	})
 	test('serialize/parse block of array', () => {
