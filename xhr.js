@@ -7,7 +7,7 @@ exports.XMLHttpRequest = function() {
 	var responseResolve
 	var responseRejected
    	var requestResolved
-	xhr.addEventListener('progress', receivedData)
+	//xhr.addEventListener('progress', receivedData)
 	var acceptSet
 	var originalSetRequestHeader = xhr.setRequestHeader
 	xhr.setRequestHeader = function(name, value) {
