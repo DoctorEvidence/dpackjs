@@ -20,3 +20,4 @@ exports.isBlock = Block.isBlock
 exports.copy = Block.copy
 exports.reassignBuffers = Block.reassignBuffers
 exports.Options = Options
+exports.createSharedStructure = require('./lib/findShared').createSharedStructure
