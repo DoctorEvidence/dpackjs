@@ -207,4 +207,47 @@ suite('dpack node tests', () => {
 			setTimeout(sendNext)
 		})
 	})
+	test.only('shared structure with blocks', function() {
+		var testData = [{ i: 1, block: { a: 1, name: 'one', type: 'odd', isOdd: true }},
+			{ i: 2, block: { a: 2, name: 'two', type: 'even'}},
+			{ i: 3, block: { a: 2.5, name: 'two point five', type: 'decimal'}}
+		]
+		var sharedSerialized, sharedSerializedChild
+		var sharedStructure = createSharedStructure(function(serialize) {
+			var serialized = serialize()
+			sharedSerialized = serialized
+		})
+		var sharedChild = createSharedStructure(function(serialize) {
+			var serialized = serialize()
+			sharedSerializedChild = serialized
+		})
+		for (var i = 0; i < 3; i++) {
+			testData[i].block = asBlock(testData[i].block, sharedChild)
+		}
+		debugger
+		var serializedWithShared = serialize(testData[0], { shared: sharedStructure })
+		var serializedWithShared1 = serialize(testData[1], { shared: sharedStructure })
+		var serializedWithShared2 = serialize(testData[2], { shared: sharedStructure })
+		var parsed = parse(serializedWithShared, { shared: sharedStructure })
+		assert.deepEqual(parsed, testData[0])
+		var parsed = parse(serializedWithShared1, { shared: sharedStructure })
+		assert.deepEqual(parsed, testData[1])
+		var parsed = parse(serializedWithShared2, { shared: sharedStructure })
+		assert.deepEqual(parsed, testData[2])
+		
+		// reset
+		sharedStructure = createSharedStructure(function(serialize) {
+			var serialized = serialize()
+			console.log('shared structure updated', serialized)
+			sharedSerialized = serialized
+		})
+		parse(sharedSerialized, { shared: sharedStructure })
+		var parsed = parse(serializedWithShared, { shared: sharedStructure })
+		assert.deepEqual(parsed, testData[0])
+		var parsed = parse(serializedWithShared1, { shared: sharedStructure })
+		assert.deepEqual(parsed, testData[1])
+		var parsed = parse(serializedWithShared2, { shared: sharedStructure })
+		assert.deepEqual(parsed, testData[2])
+	})
+
 })
