@@ -1,8 +1,7 @@
 "use strict"
 var createParser = require('./lib/parse').createParser
 
-window.createParser = createParser
-var serialize = window.serialize = require('./lib/serialize').serialize
+var serialize = require('./lib/serialize').serialize
 function readResponse(response, onProgress) {
 	var reader = response.body.getReader()
 	return new Promise(function(resolve, reject) {
