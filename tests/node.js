@@ -212,6 +212,7 @@ suite('dpack node tests', () => {
 			{ i: 2, block: { a: 2, name: 'two', type: 'even'}},
 			{ i: 3, block: { a: 2.5, name: 'two point five', type: 'decimal'}}
 		]
+		debugger
 		var sharedStructure = createSharedStructure()
 		var sharedChild = createSharedStructure()
 		for (var i = 0; i < 3; i++) {
@@ -230,8 +231,10 @@ suite('dpack node tests', () => {
 		var sharedSerializedChild = sharedChild.serialized
 		
 		// reset
-		sharedStructure = createSharedStructure(function() {
-			console.log('shared structure updated', sharedStructure.serialized)
+		sharedStructure = createSharedStructure(sharedSerialized, {
+			onUpdate: function() {
+				console.log('shared structure updated', sharedStructure.serialized)
+			}
 		})
 		parse(sharedSerialized, { shared: sharedStructure })
 		var parsed = parse(serializedWithShared, { shared: sharedStructure })
