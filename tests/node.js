@@ -213,7 +213,7 @@ suite('dpack node tests', () => {
 		const parsed = parse(serialized)
 		assert.equal(JSON.stringify(parsed), JSON.stringify(data))
 	})
-	test('shared structure with blocks', function() {
+	test.only('shared structure with blocks', function() {
 		var testData = [{ i: 1, block: { a: 1, name: 'one', type: 'odd', isOdd: true }},
 			{ i: 2, block: { a: 2, name: 'two', type: 'even'}},
 			{ i: 3, block: { a: 2.5, name: 'two point five', type: 'decimal'}}
