@@ -2,7 +2,7 @@ const { assert } = require('chai')
 const { serialize, parse, parseLazy, createParseStream, createSerializeStream, createSharedStructure, asBlock, copy, Options, getLazyHeader } = require('..')
 const fs = require('fs')
 var inspector = require('inspector')
-inspector.open(9329, null, true)
+//inspector.open(9329, null, true)
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 
 suite('dpack node tests', () => {
@@ -213,12 +213,11 @@ suite('dpack node tests', () => {
 		const parsed = parse(serialized)
 		assert.equal(JSON.stringify(parsed), JSON.stringify(data))
 	})
-	test.only('shared structure with blocks', function() {
+	test('shared structure with blocks', function() {
 		var testData = [{ i: 1, block: { a: 1, name: 'one', type: 'odd', isOdd: true }},
 			{ i: 2, block: { a: 2, name: 'two', type: 'even'}},
 			{ i: 3, block: { a: 2.5, name: 'two point five', type: 'decimal'}}
 		]
-		debugger
 		var sharedStructure = createSharedStructure()
 		var sharedChild = createSharedStructure()
 		for (var i = 0; i < 3; i++) {
