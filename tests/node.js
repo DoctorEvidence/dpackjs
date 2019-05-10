@@ -214,18 +214,26 @@ suite('dpack node tests', () => {
 		assert.equal(JSON.stringify(parsed), JSON.stringify(data))
 	})
 	test('shared structure with blocks', function() {
-		var testData = [{ i: 1, block: { a: 1, name: 'one', type: 'odd', isOdd: true }},
-			{ i: 2, block: { a: 2, name: 'two', type: 'even'}},
-			{ i: 3, block: { a: 2.5, name: 'two point five', type: 'decimal'}}
+		var testData = [{ i: 1,
+				block: { a: 1, name: 'one', type: 'odd', isOdd: true },
+				multiple: [{ c: 2}, { d: 5 }]},
+			{ i: 2,
+				block: { a: 2, name: 'two', type: 'even'},
+				multiple: [{ c: 2}, { d: 5 }]},
+			{ i: 3,
+				block: { a: 2.5, name: 'two point five', type: 'decimal'},
+				multiple: [{ c: 2}, { d: 5 }]}
 		]
 		var sharedStructure = createSharedStructure()
-		var sharedChild = createSharedStructure()
 		for (var i = 0; i < 3; i++) {
-			testData[i].block = asBlock(testData[i].block, sharedChild)
+			testData[i].block = asBlock(testData[i].block)
+			testData[i].multiple[0] = asBlock(testData[i].multiple[0])
+			testData[i].multiple[1] = asBlock(testData[i].multiple[1])
 		}
 		var serializedWithShared = serialize(testData[0], { shared: sharedStructure })
 		var serializedWithShared1 = serialize(testData[1], { shared: sharedStructure })
 		var serializedWithShared2 = serialize(testData[2], { shared: sharedStructure })
+		debugger
 		var parsed = parse(serializedWithShared, { shared: sharedStructure })
 		assert.deepEqual(parsed, testData[0])
 		var parsed = parse(serializedWithShared1, { shared: sharedStructure })
@@ -233,7 +241,6 @@ suite('dpack node tests', () => {
 		var parsed = parse(serializedWithShared2, { shared: sharedStructure })
 		assert.deepEqual(parsed, testData[2])
 		var sharedSerialized = sharedStructure.serialized
-		var sharedSerializedChild = sharedChild.serialized
 		
 		// reset
 		sharedStructure = createSharedStructure(sharedSerialized, {
@@ -241,7 +248,6 @@ suite('dpack node tests', () => {
 				console.log('shared structure updated', sharedStructure.serialized)
 			}
 		})
-		parse(sharedSerialized, { shared: sharedStructure })
 		var parsed = parse(serializedWithShared, { shared: sharedStructure })
 		assert.deepEqual(parsed, testData[0])
 		var parsed = parse(serializedWithShared1, { shared: sharedStructure })
