@@ -12,9 +12,6 @@ var zlib = tryRequire('zlib')
 var deflateSync = zlib.deflateSync
 var inflateSync = zlib.inflateSync
 var constants = zlib.constants
-var snappy = tryRequire('snappy')
-var compressSync = snappy.compressSync
-var uncompressSync = snappy.uncompressSync
 try {
 	var { decode, encode } = require('msgpack-lite')
 } catch (error) {}
@@ -198,16 +195,18 @@ suite('dpack basic tests', function(){
 		assert.deepEqual(parsed, data)
 	})
 
-	test.skip('big utf8', function() {
+	test('utf16', function() {
 		var data = sampleData
 		this.timeout(10000)
-		var serialized = serialize(data, { utf8: true })
+		var serialized = serialize(data, { encoding: 'utf16le' })
 		var serializedGzip = deflateSync(serialized)
 		console.log('size', serialized.length)
 		console.log('deflate size', serializedGzip.length)
 		var parsed
+		parsed = parse(serialized, { encoding: 'utf16le' })
+		assert.deepEqual(parsed, data)
 		for (var i = 0; i < ITERATIONS; i++) {
-			parsed = parse(serialized, { utf8: true })
+			parsed = parse(serialized, { encoding: 'utf16le' })
 			//parsed = parse(inflateSync(serializedGzip))
 			parsed.Settings
 		}
