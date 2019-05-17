@@ -22,6 +22,7 @@
     "msgpack-lite": "^0.1.26",
     "snappy": "^6.0.4",
     "webpack": "^4.16.3",
+    "webpack-cli": "^3.3.2",
     "webpack-command": "^0.4.1"
   }
 }
