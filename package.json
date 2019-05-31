@@ -1,7 +1,7 @@
 {
   "name": "dpack",
   "author": "Kris Zyp",
-  "version": "0.5.15",
+  "version": "0.6.0",
   "description": "Efficient, compact binary format for serializing data structures with extensible typing",
   "license": "MIT",
   "repository": {
