@@ -21,3 +21,4 @@ exports.copy = Block.copy
 exports.reassignBuffers = Block.reassignBuffers
 exports.Options = Options
 exports.createSharedStructure = require('./lib/shared').createSharedStructure
+exports.readSharedStructure = require('./lib/shared').readSharedStructure
