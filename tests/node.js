@@ -2,7 +2,7 @@ const { assert } = require('chai')
 const { serialize, parse, parseLazy, createParseStream, createSerializeStream, createSharedStructure, asBlock, copy, Options, getLazyHeader } = require('..')
 const fs = require('fs')
 var inspector = require('inspector')
-inspector.open(9330, null, true)
+//inspector.open(9330, null, true)
 var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
 
 suite('dpack node tests', () => {
