@@ -4,14 +4,15 @@ DPack is a very compact binary format for serializing data structures, designed 
 * Uses internal referencing and reuse of properties, values, and objects for very compact serialization and fast parsing.
 * Defined as a valid unicode character string, which allows for single-pass text decoding for faster and simpler decoding (particulary in browser), support across older browsers, and ease of manipulation as a character string. It can also be encoded in UTF-8, UTF-16, or any ASCII compatible encoding.
 * Supports a wide range of types including strings, decimal-based numbers, booleans, objects, arrays, dates, maps, sets, and user-provided classes/types.
-* Supports byte-length mapped object properties for lazy evaluation of paths for faster access to data without parsing entire data structures (useful for efficient and scalable storing, querying, and indexing data in databases).
+* Supports separable blocks of object properties for lazy evaluation of paths for faster access to data without parsing entire data structures (useful for efficient and scalable storing, querying, and indexing data in databases).
 * Supports referencing of objects and values which can be used advanced serialization and reuse of objects.
 * Optimized to compress well with Huffman/Gzip encoding schemes.
 
 In addition this dpack library features:
 * Streaming, progressive parsing in the browser, so data can be parsed during download instead of waiting until it completed.
 * Asynchronous, progressive streaming of data from Node, utilizing back-pressure to load and stream data while miminizing memory/resource consumption, with support for lazy-loaded resources.
-* Less than 15KB minimized (5KB gzipped).
+* Support for Proxy-based blocks for lazy parsing and copy-on-write modifications with efficient serialization reuse.
+* Browser modules less than 18KB minimized (6KB gzipped).
 
 ## Intended Use
 
@@ -36,7 +37,7 @@ The `serialize` function accepts a value (object, array, string, etc.), and will
 * Objects - Any plain object
 * Arrays
 * Strings
-* Numbers (including Infinity, -Infinity), encoded in decimal format
+* Numbers
 * Boolean
 * null
 * Map
@@ -49,11 +50,11 @@ This dpack library also supports progressive parsing by augmenting the `XMLHttpR
 ```
 const { XMLHttpRequest } = require('dpack');
 var xhr = new XMLHttpRequest();
-xhr.open('GET', 'my/dpack-data', true)
-xhr.send()
+xhr.open('GET', 'my/dpack-data', true);
+xhr.send();
 xhr.addEventListener('progress', () => {
-	var partialData = xhr.responseParsed; // all the data that has been downloaded so far is parsed, and accessible here as it downloads
-}
+	var partialData = xhr.responseParsed; // all the data that has been downloaded so far is parsed is accessible here as it downloads
+});
 xhr.addEventListener('load', ()  => {
 	var data = xhr.responseParsed; // finished downloading, full data available
 });
@@ -78,17 +79,17 @@ const { Options, serialize, parse } = require('dpack');
 
 class Greeting {
 	constructor(target) {
-		this.target = target
+		this.target = target;
 	}
 	printGreeting() {
-		console.log('Hello, ' + this.target)
+		console.log('Hello, ' + this.target);
 	}
 }
-let options = new Options()
-options.addExtension(Greeting)
-let serialized = serialize({ myGreeting: new Greeting('World')}, options)
-let data = parse(serialized, options)
-data.myGreeting.printGreeting() // prints "Hello, World"
+let options = new Options();
+options.addExtension(Greeting);
+let serialized = serialize({ myGreeting: new Greeting('World')}, options);
+let data = parse(serialized, options);
+data.myGreeting.printGreeting(); // prints "Hello, World"
 ```
 
 ## Streams
@@ -96,9 +97,9 @@ The dpack library provides Node transforming streams for streamed parsing and se
 ```
 const { createSerializeStream } = require('dpack');
 var stream = createSerializeStream();
-stream.pipe(targetStream) // this could be an HTTP response, or other network stream
-stream.write(data) // write a data structure, and it will be serialized, with more to come
-stream.end(data) // write a data structure, and it will be serialized as the last data item.
+stream.pipe(targetStream); // this could be an HTTP response, or other network stream
+stream.write(data); // write a data structure, and it will be serialized, with more to come
+stream.end(data); // write a data structure, and it will be serialized as the last data item.
 ```
 Likewise, we can read do streamed parsing:
 ```
@@ -109,14 +110,16 @@ stream.on('data', (data) => {
 	// when data is received
 });
 ```
+Note that DPack can more efficiently stream data if it is the last data, through the `end(data)` call, and that should generally be used unless multiple blocks need to be sent.
+
 ### Asynchronous/Lazy Streaming
 A serializing stream can also stream data structures that may contain embedded data that is asynchronously or lazily loaded. This can be a powerful way to leverage Node's backpressure functionality to defer loading embedded data until network buffers are ready to consume them. This is accomplished by including `then`able data. A promise can be included in your data, or custom `then`able. For example:
 ```
 var stream = createSerializeStream();
 var responseData = {
 	someData: fetch('/some/url') // when serializing, dpack will pause at this point, and wait for the promise to resolve
-}
-stream.end(data) // write the data structure (will pause as necessary for async data)
+};
+stream.end(data); // write the data structure (will pause as necessary for async data)
 ```
 Here is an example of using a custom `then`-able, where dpack will wait to call `then` for each object until there is no back pressure from sending the previous object, ensuring that data is not loaded from a database until network buffers are ready to consume the data:
 ```
@@ -136,53 +139,99 @@ Options can also be provided as argument to `createParseStream` or `createSerial
 ## Blocks
 Blocks provide a mechanism for specifying a chunk of dpack data that can be parsed on-demand. A dpack file or stream can be broken up into multiple blocks that can be lazily evaluated. This can be particularly valuable for interaction with binary data from database where eagerly parsing an entire data structure may be unnecessary and expensive for querying or indexing data.
 
+Note that lazy evaluation uses the EcmaScript `Proxy` class, which is not available in older browsers (it is intended for use in NodeJS for database purposes). However, blocks can still be read (without lazy evaluatoin) with the standard parser in all browsers.
+
 ### Lazy Parsing/Evaluation
 The dpack libary supports lazy parsing using the `parseLazy` variant of `parse`. This function will return `Proxy` that is mapped to the serialized data, that will parse/evaluate the encoded data when any property is accessed:
 ```
-const { parseLazy } = require('dpack')
-var parsed = parseLazy(serializedData) // no immediate parsing, can return almost immediately
+const { parseLazy } = require('dpack');
+var parsed = parseLazy(serializedData); // no immediate parsing, can return almost immediately
 // parsed is mapped to serializedData, but won't be parsed until data is accessed:
 parsed.someProperty // parsing is now performed
-parsed.otherProperty // parising has already been performed on the root block and cached
+parsed.otherProperty // parsing has already been performed on the root block and cached
 ```
 Blocks can be embedded in the data structure so that lazy parsing/evaluation can continue to be deferred as child objects are accessed. Blocks can be defined using the `asBlock` function:
 ```
-const { parseLazy, serialize, asBlock } = require('dpack')
-let data = {
+const { parseLazy, serialize, asBlock } = require('dpack');
+let data = asBlock({
 	category: 'Small data',
 	bigData: asBlock(bigDataStructure),
 	smallObject: {}
-};
+});
 let serialized = serialize(data);
 let parsed = parseLazy(serialized); // root block is deferred
 let category = parsed.category; // root block is parsed, but bigData is *not* parsed and doesn't need to be until accessed
 ```
 Because the object in the `bigData` property has been defined in a sub-block, it does not need to be parsed until one of its properties is accessed. This separation of blocks can provide substantial performance benefits for accessing a property like `category` without having to parse another block that is contained in the full message. This parsing may not ever be necessary if the data is later serialized (like for an HTTP response), since dpack can also serialize a block directly from its mapped data without having to re-parse and serialize.
 
-### Blocks in Streams
-Again, blocks can be reserialized directly from their mapped binary or string data without needing to be parsed, if they have not been accessed or modified. Expanding on the previous example:
+### Serializing Blocks
+Again, blocks can be reserialized directly from their mapped binary or string data without needing to be parsed, if they have not been accessed or modified (and if accessed, but not modified, they don't need to be reserialized). This can provide enormous performance benefits where data stored in a database can be mapped to lazy proxies and potentially delivered to the browser without any unnecessary parsing or serialization. Expanding on the previous example:
 ```
 if (parsed.category == 'Small data') {
 	serialize(parsed); // original source binary data is used to serialize
 }
 ```
-Data from blocks can also be modified, which will indicate that it would need to be re-serialized:
+Data from blocks can also be modified. However, by default `parseLazy` returns an immutable data structure. DPack approach to modifying data through explicit copy-on-write. So if you want a modified block, you first should get a copy of it. The copy will still use lazy evaluation and modifications will be recorded internally to track what needs to be re-serialized:
 ```
-parsed.newData = 'something new';
+const { copy } = require('dpack');
+let myCopy = copy(parsed);
+myCopy.newData = 'something new';
 serialize(parsed);
 ```
-In this case, the data in the root block has changed, and so it needs to be reserialized. However, the embedded `bigData` object has not changed and does not require any parsing or serialization, and can be re-persisted or sent over a network with only the effort of re-serializing the root object.
+In this case, the data in the root block has changed, and so it needs to be reserialized. However, the embedded `bigData` object (that was copied) has not changed and does not require any parsing or serialization, and can be re-persisted or sent over a network with only the effort of re-serializing the root object.
 
-However, some care must be take if you are modifying sub-objects, as these will notify the block proxy of changes. For example, if instead we change a sub-object:
+We can even make changes to sub-objects and they will be tracked:
 ```
-parsed.smallObject.changed = 'something new';
+myCopy.smallObject.changed = 'something new';
 ```
-The `parsed` object won't have any property changes. You should re-set the property on the parent object so the change is recorded (and it knows to reserialize):
+Blocks can serialized directly with the `serialize` method or in streams as well.
+
+## Shared Structures
+DPack achieves compact representation of object structures by reusing structure and property information. Serializing small objects on their own will not have significant benefit, but this can structure/property reuse can be still be realized in a system with many smaller objects by using shared structures. A shared structure is a dpack representation of the structure/properties of objects with the same or similar structure, and the shared structure can be applied to the serialization and parsing of similar objects to yield more compact individual serializations that can then be parsed in combination with the shared structure. This can be particularly useful in a database/store where a shared structure can be associated with a table of many objects that can be serialized and parsed with their shared structure, reducing redundancy in the database.
+
+To create a shared structure, we start with:
 ```
-let smallObject = parsed.smallObject;
-smallObject.changed = 'something new';
-parsed.smallObject = smallObject;
+const { createSharedStructure } = require('dpack');
+const sharedStructure = createSharedStructure();
 ```
+And then serialize with it:
+```
+serialize(myObject, { shared: sharedStructure });
+```
+Using this approach, the shared structure will be generated on the fly. The serialization of `myObject` will now be dependent on the shared structure, which will be needed to parse it:
+```
+parse(myObject, { shared: sharedStructure });
+```
+
+However, for optimum performance, generating shared structures on the fly is usually not desirable. Ideally, we can use this to generate a shared structure, and then use the provided method to write out the common properties, and then use these pre-generated shared structure. Continuing from the example above:
+```
+const commonStructure = sharedStructure.serializeCommonStructure();
+fs.writeFileSync('shared.dpack', commonStructure);
+```
+The `serializeCommonStructure` will actually look at the count of how many times properties, structures, and values are used to exclude spurious/rare properties, and provide a highly optimized shared structure. The returned `commonStructure` will be in dpack format as a buffer, and can be written to a file or database. For most database applications, we recommend actually committing it to source control, so it deterministically tracked with your code. Once this shared structure is created, we can then read it for subsequent use as a frozen shared structure that is much more performant:
+```
+const { readSharedStructure } = require('dpack');
+const sharedStructure = readSharedStructure(fs.readFileSync('shared.dpack'));
+// and now we use this shared structure for all of the objects we store in our database:
+let serialized = serialize(myObject, { shared: sharedStructure })
+myStore.put(key, serialized); // now store it in our database
+...
+let serialized = myStore.get(key);
+let myObject = parse(serialized, { shared: sharedStructure });
+```
+Shared structures can be used in combination with blocks, and the blocks will record the shared structure that were serialized with and properly out that shared structure when serialized. For example, if we read the data as blocks:
+```
+let myBlock = parseLazy(serialized, { shared: sharedStructure })
+```
+And then serialized _without_ the shared structure, to send to an external system, the dpack serializer will recognize that the shared structure won't be used by the parser, and will automatically include it by prepending to the serialization:
+```
+let serialized = serialize(myBlock); // this output the concatentation of the shared structure with the block's data
+```
+And furthermore, the serializer is smart enough to only include the shared structure once for multiple blocks of the same type:
+```
+let serialized = serialize([myBlock1, myBlock2, myBlock3]);
+```
+In this case, the shared structure will be prepended once (in the correct location in the array), and reused for subsequent blocks that have the same shared structure. And again, the resulting serialization will be completely autonomous, it can be sent to a browser and parsed with the standard parser with no a priori knowledge of the shared structure.
 
 ## Specification
 The [specification of the dpack format is available here](https://github.com/DoctorEvidence/dpack).
