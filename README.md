@@ -158,11 +158,13 @@ let data = asBlock({
 	bigData: asBlock(bigDataStructure),
 	smallObject: {}
 });
-let serialized = serialize(data);
+let serialized = serialize(data, { lazy: true });
 let parsed = parseLazy(serialized); // root block is deferred
 let category = parsed.category; // root block is parsed, but bigData is *not* parsed and doesn't need to be until accessed
 ```
 Because the object in the `bigData` property has been defined in a sub-block, it does not need to be parsed until one of its properties is accessed. This separation of blocks can provide substantial performance benefits for accessing a property like `category` without having to parse another block that is contained in the full message. This parsing may not ever be necessary if the data is later serialized (like for an HTTP response), since dpack can also serialize a block directly from its mapped data without having to re-parse and serialize.
+
+DPack accomplishes this using an extra size/offset table in the header of the returned binary/buffer data. In order to use this, the serialization must be performed with the `lazy` flag, and the parsing must be performed with `parseLazy`.
 
 ### Serializing Blocks
 Again, blocks can be reserialized directly from their mapped binary or string data without needing to be parsed, if they have not been accessed or modified (and if accessed, but not modified, they don't need to be reserialized). This can provide enormous performance benefits where data stored in a database can be mapped to lazy proxies and potentially delivered to the browser without any unnecessary parsing or serialization. Expanding on the previous example:
@@ -221,11 +223,11 @@ let myObject = parse(serialized, { shared: sharedStructure });
 ```
 Shared structures can be used in combination with blocks, and the blocks will record the shared structure that were serialized with and properly out that shared structure when serialized. For example, if we read the data as blocks:
 ```
-let myBlock = parseLazy(serialized, { shared: sharedStructure })
+let myBlock = parseLazy(serialized, { shared: sharedStructure });
 ```
-And then serialized _without_ the shared structure, to send to an external system, the dpack serializer will recognize that the shared structure won't be used by the parser, and will automatically include it by prepending to the serialization:
+And then serialized _without_ the shared structure, to send to an external system, the dpack serializer will recognize that the shared structure won't be used by the parser, and will automatically include it by prepending to the serialization. This will output the concatentation of the shared structure with the block's data:
 ```
-let serialized = serialize(myBlock); // this output the concatentation of the shared structure with the block's data
+let serialized = serialize(myBlock);
 ```
 And furthermore, the serializer is smart enough to only include the shared structure once for multiple blocks of the same type:
 ```
