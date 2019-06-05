@@ -25,7 +25,7 @@ exports.XMLHttpRequest = function() {
 
 	function receivedData(event) {
 		var sourceText = xhr.responseText
-//		try {
+		try {
 			if (parser) {
 				if (parser.onResume) {
 					var updatedData = parser.onResume(sourceText.slice(lastOffset), true, true)
@@ -41,13 +41,13 @@ exports.XMLHttpRequest = function() {
 					return
 			}
 			lastOffset = sourceText.length
-/*		} catch (error) {
+		} catch (error) {
 			if (xhr.onerror) {
 				xhr.onerror(error)
 			} else {
 				throw error
 			}
-		}*/
+		}
 	}
 	xhr.addEventListener('load', function(event) {
 		receivedData()
