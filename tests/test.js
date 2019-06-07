@@ -12,6 +12,7 @@ var zlib = tryRequire('zlib')
 var deflateSync = zlib.deflateSync
 var inflateSync = zlib.inflateSync
 var constants = zlib.constants
+var avro = tryRequire('avsc')
 try {
 	var { decode, encode } = require('msgpack-lite')
 } catch (error) {}
@@ -276,9 +277,30 @@ suite('dpack basic tests', function(){
 		//console.log({ shortRefCount, longRefCount })
 		var parsed
 		for (var i = 0; i < ITERATIONS; i++) {
-			//parsed = parse(serialized)
-			parsed = parse(inflateSync(serializedGzip))
+			parsed = parse(serialized)
+			//parsed = parse(inflateSync(serializedGzip))
 			parsed.Settings
+		}
+	})
+	test('performance serialize avro', function() {
+		const type = avro.Type.forValue(sampleData);
+		// We can use `type` to encode any values with the same structure:
+		let serialized = type.toBuffer(sampleData);
+		console.log('size', serialized.length, type.toString().length)
+		for (var i = 0; i < ITERATIONS; i++) {
+			serialized = type.toBuffer(sampleData);
+		}
+	})
+	test('performance avro', function() {
+		const type = avro.Type.forValue(sampleData);
+
+		// We can use `type` to encode any values with the same structure:
+		let serialized = type.toBuffer(sampleData);
+		var serializedGzip = deflateSync(serialized)
+		console.log('size', serialized.length, serializedGzip.length)
+		let data
+		for (var i = 0; i < ITERATIONS; i++) {
+			data = type.fromBuffer(serialized);
 		}
 	})
 	test('performance V8 serialize', function() {
@@ -333,7 +355,7 @@ suite('dpack basic tests', function(){
 		for (var i = 0; i < ITERATIONS; i++) {
 			//serialized = serialize(data, { shared: sharedStructure })
 			var serialized = serialize(data)
-			var serializedGzip = deflateSync(serialized)
+			//var serializedGzip = deflateSync(serialized)
 		}
 		//console.log('serialized', serialized.length, global.propertyComparisons)
 	})

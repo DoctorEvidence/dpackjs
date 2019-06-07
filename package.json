@@ -13,10 +13,12 @@
   },
   "main": "./index.js",
   "typings": "./index.d.ts",
-  "dependencies": {},
+  "dependencies": {
+  },
   "optionalDependencies": {},
   "devDependencies": {
     "@types/node": "latest",
+    "avsc": "^5.4.10",
     "chai": "^4",
     "mocha": "^4",
     "msgpack-lite": "^0.1.26",
