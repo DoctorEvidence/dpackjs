@@ -32,7 +32,7 @@ data = [
     "benefit": "Beyond objects and arrays, support for maps, sets, dates, and user-defined types"
   },
   {
-    "feature": "Byte-length blocks",
+    "feature": "Seperable blocks",
     "benefit": "Support for on-demand parsing of properties/sub-objects"
   },
   {

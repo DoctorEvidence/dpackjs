@@ -302,7 +302,7 @@ h3.demo-header {
 textarea {
   font-family: monospace;
   font-size: 12px;
-  height: 80%;
+  height: calc(96% - 70px);
   width: 100%;
   background-color: #fafafa;
 }
@@ -313,7 +313,7 @@ label {
 .main-content {
   position: absolute;
   top: 350px;
-  bottom: 30px;
+  bottom: 60px;
   left: 0;
   right: 0;
 }
