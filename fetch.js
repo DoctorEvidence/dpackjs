@@ -40,43 +40,37 @@ function readResponse(response, onProgress) {
 				if (next.done) {
 					resolve(parsedData)
 				} else {
-					var bytes = next.value
-					var sourceText
-					if (queuedBytes) {
-						// if we are resuming from the middle of a character, concatenate the bytes and decode it
-						sourceText = decoder.decode(new Uint8Array(Array.from(queuedBytes).concat(Array.from(bytes.slice(0, queuedBytes.needs)))))
-						// and then remove the consumed byte(s)
-						bytes = bytes.slice(queuedBytes.needs)
-						bytes = queueUnfinishedChar(bytes)
-						sourceText += decoder.decode(bytes)
-					} else {
-						bytes = queueUnfinishedChar(bytes)
-						sourceText = decoder.decode(bytes)
-					}
-					if (parser) {
-						if (parser.onResume) {
-							var updatedData = parser.onResume(sourceText, true)
-							parsedData = parsedData || updatedData
+					try {
+						var bytes = next.value
+						var sourceText
+						if (queuedBytes) {
+							// if we are resuming from the middle of a character, concatenate the bytes and decode it
+							sourceText = decoder.decode(new Uint8Array(Array.from(queuedBytes).concat(Array.from(bytes.slice(0, queuedBytes.needs)))))
+							// and then remove the consumed byte(s)
+							bytes = bytes.slice(queuedBytes.needs)
+							bytes = queueUnfinishedChar(bytes)
+							sourceText += decoder.decode(bytes)
+						} else {
+							bytes = queueUnfinishedChar(bytes)
+							sourceText = decoder.decode(bytes)
 						}
-					} else {
-						parser = createParser()
-						parser.setSource(sourceText, 0, true)
-						parsedData = parser.read()
+						if (parser) {
+							if (parser.onResume) {
+								var updatedData = parser.onResume(sourceText, true)
+								parsedData = parsedData || updatedData
+							}
+						} else {
+							parser = createParser()
+							parser.setSource(sourceText, 0, true)
+							parsedData = parser.read()
+						}
+						parser.read()
+						readNext()
+					} catch(error) {
+						reject(error)
 					}
-					parser.read()
-					readNext()
 				}
-			})
-		}
-		function onError(error) {
-			if (error.message == 'Unexpected end of dpack stream') {
-				parsedData = parsedData || error.valueInProgress
-				if (onProgress) {
-					onProgress(parsedData, response)
-				}
-			} else {
-				reject(error)
-			}
+			}, reject)
 		}
 		readNext()
 	})
