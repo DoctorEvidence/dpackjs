@@ -273,7 +273,7 @@ suite('dpack basic tests', function(){
 		var serialized = serialize(data)
 		var serializedGzip = deflateSync(serialized)
 		console.log('size', serialized.length)
-		//console.log('deflate size', serializedGzip.length)
+		console.log('deflate size', serializedGzip.length)
 		//console.log({ shortRefCount, longRefCount })
 		var parsed
 		for (var i = 0; i < ITERATIONS; i++) {
