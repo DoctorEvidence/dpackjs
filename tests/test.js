@@ -220,6 +220,10 @@ suite('dpack basic tests', function(){
 		assert.isTrue(typeof data.Data == 'object')
 	})
 
+	test('mixed map', function() {
+		toMap = [{"key":22670471,"value":["SUBRIU"]},{"key":302461,"value":["SUCSgc"]},{"key":159653782,"value":["SUBrVs"]},{"key":159653789,"value":["SUyGO"]},{"key":159653792,"value":["SUFgs2"]},{"key":159653799,"value":["SUGhpW"]},{"key":159653802,"value":"literal:Overall Study, Other"},{"key":928494,"value":"literal:Overall"},{key: 159654549, value: ["SUE98q"]}]
+	})
+
 	test('performance msgpack-lite', function() {
 		var data = sampleData
 		this.timeout(10000)
