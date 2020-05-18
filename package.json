@@ -1,7 +1,7 @@
 {
   "name": "dpack",
   "author": "Kris Zyp",
-  "version": "0.6.19",
+  "version": "0.6.20",
   "description": "Efficient, compact binary format for serializing data structures with extensible typing",
   "license": "MIT",
   "repository": {
@@ -13,8 +13,7 @@
   },
   "main": "./index.js",
   "typings": "./index.d.ts",
-  "dependencies": {
-  },
+  "dependencies": {},
   "optionalDependencies": {},
   "devDependencies": {
     "@types/node": "latest",
@@ -22,7 +21,6 @@
     "chai": "^4",
     "mocha": "^4",
     "msgpack-lite": "^0.1.26",
-    "snappy": "^6.0.4",
     "webpack": "^4.16.3",
     "webpack-cli": "^3.3.2",
     "webpack-command": "^0.4.1"
