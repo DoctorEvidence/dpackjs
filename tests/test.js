@@ -19,14 +19,13 @@ try {
 
 if (typeof XMLHttpRequest === 'undefined') {
 	var fs = require('fs')
-	var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/study.json'))
+	var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/term.json'))
 } else {
 	var xhr = new XMLHttpRequest()
 	xhr.open('GET', 'samples/study.json', false)
 	xhr.send()
 	var sampleData = JSON.parse(xhr.responseText)
 }
-
 var serialize = dpack.serialize
 var parse = dpack.parse
 var parseLazy = dpack.parseLazy
@@ -36,7 +35,7 @@ var asBlock = dpack.asBlock
 var Options = dpack.Options
 var createSharedStructure = dpack.createSharedStructure
 var readSharedStructure = dpack.readSharedStructure
-var ITERATIONS = 1000
+var ITERATIONS = 40000
 
 suite('dpack basic tests', function(){
 	test('serialize/parse data', function(){
@@ -223,8 +222,30 @@ suite('dpack basic tests', function(){
 	test('mixed map', function() {
 		toMap = [{"key":22670471,"value":["SUBRIU"]},{"key":302461,"value":["SUCSgc"]},{"key":159653782,"value":["SUBrVs"]},{"key":159653789,"value":["SUyGO"]},{"key":159653792,"value":["SUFgs2"]},{"key":159653799,"value":["SUGhpW"]},{"key":159653802,"value":"literal:Overall Study, Other"},{"key":928494,"value":"literal:Overall"},{key: 159654549, value: ["SUE98q"]}]
 	})
+	test('shared structure', function() {
+		var testData = [{"Enum":{"Id":14,"Name":"AttributeName"},"Binding":{"IsBound":true,"Phrases":[{"Conjunction":"or","Terms":[{"IsDisplaySynonym":false,"IsRoot":true,"IsSubgroup":false,"SynonymId":415579},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":71175},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":61423549},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":141278106},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":70385}]}]},"BoundName":"VAS Pain on Nominated Activity Active Knees Calculated","LookupTable":{"Id":148364057,"Name":"VAS, Pain, On Nominated Activity, Active Knee, Calculated","Gestalt":"VAS, Pain, On Nominated Activity, Active Knee, Calculated"},"LookupTableId":148364057,"Scope":{"Id":107228406,"Name":"DocumentSet : Efficacy and Safety of Hylan G-F 20 vs Steroid Injection for OA: A Systematic Literature Review","Gestalt":"DocumentSet : Efficacy and Safety of Hylan G-F 20 vs Steroid Injection for OA: A Systematic Literature Review","Type":"DocumentSet"},"ScopeId":107228406,"Synonyms":[{"Id":70385,"Name":"Calculated","Gestalt":"Calculated"},{"Id":71175,"Name":"Pain","Gestalt":"Pain"},{"Id":415579,"Name":"VAS","Gestalt":"VAS"},{"Id":61423549,"Name":"on Nominated Activity","Gestalt":"on Nominated Activity"},{"Id":141278106,"Name":"Active Knees","Gestalt":"Active Knees"}],"SynonymsCount":5,"Workflows":[],"WorkflowsCount":0,"Id":148434563,"Created":"2019-03-12T17:46:28.8558375Z","Updated":"2019-03-12T21:36:52.1289574Z","CreatorId":null,"VersionNo":4,"Locked":false,"Gestalt":"VAS Pain on Nominated Activity Active Knees Calculated"},
+			{"Enum":{"Id":14,"Name":"AttributeName"},"extra": 3, "Binding":{"IsBound":true,"Phrases":[{"Conjunction":"or","Terms":[{"IsDisplaySynonym":false,"IsRoot":true,"IsSubgroup":false,"SynonymId":412832}]}]},"BoundName":"thrombocytopenia,","LookupTable":{"Id":1004902,"Name":"​​All grades: Haematological, Thrombocytopenia","Gestalt":"Thrombocytopenia"},"LookupTableId":1004902,"Scope":{"Id":67058053,"Name":"DocumentSet : Global","Gestalt":"DocumentSet : Global","Type":"DocumentSet"},"ScopeId":67058053,"Synonyms":[{"Id":412832,"Name":"thrombocytopenia,","Gestalt":"thrombocytopenia,"}],"SynonymsCount":1,"Workflows":[],"WorkflowsCount":0,"Id":67096694,"Created":"2017-02-11T04:10:55.1825881Z","Updated":"2017-02-11T04:10:55.1895882Z","CreatorId":null,"VersionNo":1,"Locked":false,"Gestalt":"thrombocytopenia,"},
+			{"Enum":{"Id":14,"Name":"AttributeName"},"extra": 4, "Binding":{"IsBound":true,"Phrases":[{"Conjunction":"or","Terms":[{"IsDisplaySynonym":false,"IsRoot":true,"IsSubgroup":false,"SynonymId":6714096},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":5430815},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":1373198}]}]},"BoundName":"Number of Treatments Anti-VEGF Agents Cumulative","LookupTable":{"Id":6686299,"Name":"# Injections, Cumulative Anti-VEGF treatments"},"LookupTableId":6686299,"Scope":{"Id":67058053,"Name":"DocumentSet : Global","Gestalt":"DocumentSet : Global","Type":"DocumentSet"},"ScopeId":67058053,"Synonyms":[{"Id":1373198,"Name":"Cumulative","Gestalt":"Cumulative"},{"Id":5430815,"Name":"Anti-VEGF Agents","Gestalt":"Anti-VEGF Agents"},{"Id":6714096,"Name":"Number of Treatments","Gestalt":"Number of Treatments"}],"SynonymsCount":3,"Workflows":[],"WorkflowsCount":0,"Id":67096987,"Created":"2017-02-11T04:10:55.3406141Z","Updated":"2017-02-11T04:10:55.3595894Z","CreatorId":null,"VersionNo":1,"Locked":false,"Gestalt":"Number of Treatments Anti-VEGF Agents Cumulative"}]
+		var sharedGenerator = createSharedStructure()
+		serialize(testData[0], { shared: sharedGenerator })
+		serialize(testData[1], { shared: sharedGenerator })
+		serialize(testData[2], { shared: sharedGenerator })
+		var serialized = sharedGenerator.serializeCommonStructure()
+		var sharedStructure = readSharedStructure(serialized)
+		var serializedWithShared = serialize(testData[0], { shared: sharedStructure })
+		var serializedWithShared1 = serialize(testData[1], { shared: sharedStructure })
+		var serializedWithShared2 = serialize(testData[2], { shared: sharedStructure })
+		var parsed = parse(serializedWithShared, { shared: sharedStructure })
+		assert.deepEqual(parsed, testData[0])
+		var parsed = parse(serializedWithShared1, { shared: sharedStructure })
+		assert.deepEqual(parsed, testData[1])
+		var parsed = parse(serializedWithShared2, { shared: sharedStructure })
+		assert.deepEqual(parsed, testData[2])
+	})
+})
+suite('dpack performance tests', function(){
 
-	test('performance msgpack-lite', function() {
+	test.skip('performance msgpack-lite', function() {
 		var data = sampleData
 		this.timeout(10000)
 		var serialized = encode(data)
@@ -242,22 +263,28 @@ suite('dpack basic tests', function(){
 	test('performance JSON.parse', function() {
 		this.timeout(10000)
 		var data = sampleData
-		var serialized = typeof Buffer === 'undefined' ? JSON.stringify(data) : Buffer.from(JSON.stringify(data))
-		var serializedGzip = deflateSync(serialized)
+		var serialized = JSON.stringify(data)
+		var serializedGzip = deflateSync(Buffer.from(serialized))
 		console.log('size', serialized.length)
-		//console.log('deflate size', serializedGzip.length)
+		console.log('deflate size', serializedGzip.length)
 		var parsed
 		for (var i = 0; i < ITERATIONS; i++) {
-			//parsed = JSON.parse(serialized)
-			parsed = JSON.parse(inflateSync(serializedGzip))
+			parsed = JSON.parse(serialized)
+			//parsed = JSON.parse(inflateSync(serializedGzip))
 			parsed.Settings
 		}
 	})
-	test.skip('performance shared', function() {
+	test('performance shared', function() {
 		this.timeout(10000)
 		var data = sampleData
 		//sharedStructure = undefined
-		var sharedStructure = readSharedStructure(fs.readFileSync('C:/DocData/portal/shared-structure/Study.dpack'))
+		var sharedGenerator = createSharedStructure()
+		serialize(sampleData, { shared: sharedGenerator })
+		serialize(sampleData, { shared: sharedGenerator })
+		//serialize(testData[2], { shared: sharedGenerator })
+		var serialized = sharedGenerator.serializeCommonStructure()
+		console.log({serialized})
+		var sharedStructure = readSharedStructure(serialized)
 		var serialized = serialize(data, { shared: sharedStructure })
 		//var serialized = serialize(data)
 		var serializedGzip = deflateSync(serialized)
@@ -286,7 +313,7 @@ suite('dpack basic tests', function(){
 			parsed.Settings
 		}
 	})
-	test('performance serialize avro', function() {
+	test.skip('performance serialize avro', function() {
 		const type = avro.Type.forValue(sampleData);
 		// We can use `type` to encode any values with the same structure:
 		let serialized = type.toBuffer(sampleData);
@@ -295,7 +322,7 @@ suite('dpack basic tests', function(){
 			serialized = type.toBuffer(sampleData);
 		}
 	})
-	test('performance avro', function() {
+	test.skip('performance avro', function() {
 		const type = avro.Type.forValue(sampleData);
 
 		// We can use `type` to encode any values with the same structure:
@@ -334,11 +361,9 @@ suite('dpack basic tests', function(){
 	})
 	test('performance JSON.stringify', function() {
 		var data = sampleData
-		var data = {"Enum":{"Id":14,"Name":"AttributeName"},"Binding":{"IsBound":true,"Phrases":[{"Conjunction":"or","Terms":[{"IsDisplaySynonym":false,"IsRoot":true,"IsSubgroup":false,"SynonymId":415579},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":71175},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":61423549},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":141278106},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":70385}]}]},"BoundName":"VAS Pain on Nominated Activity Active Knees Calculated","LookupTable":{"Id":148364057,"Name":"VAS, Pain, On Nominated Activity, Active Knee, Calculated","Gestalt":"VAS, Pain, On Nominated Activity, Active Knee, Calculated"},"LookupTableId":148364057,"Scope":{"Id":107228406,"Name":"DocumentSet : Efficacy and Safety of Hylan G-F 20 vs Steroid Injection for OA: A Systematic Literature Review","Gestalt":"DocumentSet : Efficacy and Safety of Hylan G-F 20 vs Steroid Injection for OA: A Systematic Literature Review","Type":"DocumentSet"},"ScopeId":107228406,"Synonyms":[{"Id":70385,"Name":"Calculated","Gestalt":"Calculated"},{"Id":71175,"Name":"Pain","Gestalt":"Pain"},{"Id":415579,"Name":"VAS","Gestalt":"VAS"},{"Id":61423549,"Name":"on Nominated Activity","Gestalt":"on Nominated Activity"},{"Id":141278106,"Name":"Active Knees","Gestalt":"Active Knees"}],"SynonymsCount":5,"Workflows":[],"WorkflowsCount":0,"Id":148434563,"Created":"2019-03-12T17:46:28.8558375Z","Updated":"2019-03-12T21:36:52.1289574Z","CreatorId":null,"VersionNo":4,"Locked":false,"Gestalt":"VAS Pain on Nominated Activity Active Knees Calculated"}
 		this.timeout(10000)
-		for (var i = 0; i < 30000; i++) {
-			var serialized = typeof Buffer === 'undefined' ? JSON.stringify(data) : Buffer.from(JSON.stringify(data))
-			var serializedGzip = deflateSync(serialized)
+		for (var i = 0; i < ITERATIONS; i++) {
+			JSON.stringify(data)
 		}
 	})
 
@@ -363,7 +388,7 @@ suite('dpack basic tests', function(){
 		}
 		//console.log('serialized', serialized.length, global.propertyComparisons)
 	})
-	test('performance encode msgpack-lite', function() {
+	test.skip('performance encode msgpack-lite', function() {
 		var data = sampleData
 		this.timeout(10000)
 		for (var i = 0; i < ITERATIONS; i++) {
@@ -372,25 +397,4 @@ suite('dpack basic tests', function(){
 		}
 	})
 
-	test('shared structure', function() {
-		debugger
-		var testData = [{"Enum":{"Id":14,"Name":"AttributeName"},"Binding":{"IsBound":true,"Phrases":[{"Conjunction":"or","Terms":[{"IsDisplaySynonym":false,"IsRoot":true,"IsSubgroup":false,"SynonymId":415579},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":71175},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":61423549},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":141278106},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":70385}]}]},"BoundName":"VAS Pain on Nominated Activity Active Knees Calculated","LookupTable":{"Id":148364057,"Name":"VAS, Pain, On Nominated Activity, Active Knee, Calculated","Gestalt":"VAS, Pain, On Nominated Activity, Active Knee, Calculated"},"LookupTableId":148364057,"Scope":{"Id":107228406,"Name":"DocumentSet : Efficacy and Safety of Hylan G-F 20 vs Steroid Injection for OA: A Systematic Literature Review","Gestalt":"DocumentSet : Efficacy and Safety of Hylan G-F 20 vs Steroid Injection for OA: A Systematic Literature Review","Type":"DocumentSet"},"ScopeId":107228406,"Synonyms":[{"Id":70385,"Name":"Calculated","Gestalt":"Calculated"},{"Id":71175,"Name":"Pain","Gestalt":"Pain"},{"Id":415579,"Name":"VAS","Gestalt":"VAS"},{"Id":61423549,"Name":"on Nominated Activity","Gestalt":"on Nominated Activity"},{"Id":141278106,"Name":"Active Knees","Gestalt":"Active Knees"}],"SynonymsCount":5,"Workflows":[],"WorkflowsCount":0,"Id":148434563,"Created":"2019-03-12T17:46:28.8558375Z","Updated":"2019-03-12T21:36:52.1289574Z","CreatorId":null,"VersionNo":4,"Locked":false,"Gestalt":"VAS Pain on Nominated Activity Active Knees Calculated"},
-			{"Enum":{"Id":14,"Name":"AttributeName"},"extra": 3, "Binding":{"IsBound":true,"Phrases":[{"Conjunction":"or","Terms":[{"IsDisplaySynonym":false,"IsRoot":true,"IsSubgroup":false,"SynonymId":412832}]}]},"BoundName":"thrombocytopenia,","LookupTable":{"Id":1004902,"Name":"​​All grades: Haematological, Thrombocytopenia","Gestalt":"Thrombocytopenia"},"LookupTableId":1004902,"Scope":{"Id":67058053,"Name":"DocumentSet : Global","Gestalt":"DocumentSet : Global","Type":"DocumentSet"},"ScopeId":67058053,"Synonyms":[{"Id":412832,"Name":"thrombocytopenia,","Gestalt":"thrombocytopenia,"}],"SynonymsCount":1,"Workflows":[],"WorkflowsCount":0,"Id":67096694,"Created":"2017-02-11T04:10:55.1825881Z","Updated":"2017-02-11T04:10:55.1895882Z","CreatorId":null,"VersionNo":1,"Locked":false,"Gestalt":"thrombocytopenia,"},
-			{"Enum":{"Id":14,"Name":"AttributeName"},"extra": 4, "Binding":{"IsBound":true,"Phrases":[{"Conjunction":"or","Terms":[{"IsDisplaySynonym":false,"IsRoot":true,"IsSubgroup":false,"SynonymId":6714096},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":5430815},{"IsDisplaySynonym":false,"IsRoot":false,"IsSubgroup":false,"SynonymId":1373198}]}]},"BoundName":"Number of Treatments Anti-VEGF Agents Cumulative","LookupTable":{"Id":6686299,"Name":"# Injections, Cumulative Anti-VEGF treatments"},"LookupTableId":6686299,"Scope":{"Id":67058053,"Name":"DocumentSet : Global","Gestalt":"DocumentSet : Global","Type":"DocumentSet"},"ScopeId":67058053,"Synonyms":[{"Id":1373198,"Name":"Cumulative","Gestalt":"Cumulative"},{"Id":5430815,"Name":"Anti-VEGF Agents","Gestalt":"Anti-VEGF Agents"},{"Id":6714096,"Name":"Number of Treatments","Gestalt":"Number of Treatments"}],"SynonymsCount":3,"Workflows":[],"WorkflowsCount":0,"Id":67096987,"Created":"2017-02-11T04:10:55.3406141Z","Updated":"2017-02-11T04:10:55.3595894Z","CreatorId":null,"VersionNo":1,"Locked":false,"Gestalt":"Number of Treatments Anti-VEGF Agents Cumulative"}]
-		var sharedGenerator = createSharedStructure()
-		serialize(testData[0], { shared: sharedGenerator })
-		serialize(testData[1], { shared: sharedGenerator })
-		serialize(testData[2], { shared: sharedGenerator })
-		var serialized = sharedGenerator.serializeCommonStructure()
-		var sharedStructure = readSharedStructure(serialized)
-		var serializedWithShared = serialize(testData[0], { shared: sharedStructure })
-		var serializedWithShared1 = serialize(testData[1], { shared: sharedStructure })
-		var serializedWithShared2 = serialize(testData[2], { shared: sharedStructure })
-		var parsed = parse(serializedWithShared, { shared: sharedStructure })
-		assert.deepEqual(parsed, testData[0])
-		var parsed = parse(serializedWithShared1, { shared: sharedStructure })
-		assert.deepEqual(parsed, testData[1])
-		var parsed = parse(serializedWithShared2, { shared: sharedStructure })
-		assert.deepEqual(parsed, testData[2])
-	})
 })

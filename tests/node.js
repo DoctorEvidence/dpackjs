@@ -54,7 +54,7 @@ suite('dpack node tests', () => {
 		assert.deepEqual(parsed, data)
 	})
 
-	test('serialize/parse copy-on-write blocks', () => {
+	test.skip('serialize/parse copy-on-write blocks', () => {
 		const data = asBlock({
 			nonBlock: 'just a string',
 			block1: asBlock({ a: 1, name: 'one', type: 'odd', isOdd: true }),
