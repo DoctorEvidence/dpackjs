@@ -1,7 +1,10 @@
 var serialize = require('./lib/serialize')
 var parse = require('./lib/parse')
 var Options = require('./lib/Options').Options
-
+var createSharedStructure = require('./lib/shared').createSharedStructure
+var readSharedStructure = require('./lib/shared').readSharedStructure
+exports.createSharedStructure = createSharedStructure
+exports.readSharedStructure = readSharedStructure
 exports.serialize = serialize.serialize
 exports.parse = parse.parse
 exports.createSerializer = serialize.createSerializer

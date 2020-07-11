@@ -22,7 +22,7 @@ if (typeof XMLHttpRequest === 'undefined') {
 	var sampleData = JSON.parse(fs.readFileSync(__dirname + '/samples/term.json'))
 } else {
 	var xhr = new XMLHttpRequest()
-	xhr.open('GET', 'samples/study.json', false)
+	xhr.open('GET', 'samples/term.json', false)
 	xhr.send()
 	var sampleData = JSON.parse(xhr.responseText)
 }
@@ -30,12 +30,13 @@ var serialize = dpack.serialize
 var parse = dpack.parse
 var parseLazy = dpack.parseLazy
 var createParseStream = dpack.createParseStream
+var createParser = dpack.createParser
 var createSerializeStream = dpack.createSerializeStream
 var asBlock = dpack.asBlock
 var Options = dpack.Options
 var createSharedStructure = dpack.createSharedStructure
 var readSharedStructure = dpack.readSharedStructure
-var ITERATIONS = 40000
+var ITERATIONS = 100000
 
 suite('dpack basic tests', function(){
 	test('serialize/parse data', function(){
@@ -243,7 +244,7 @@ suite('dpack basic tests', function(){
 		assert.deepEqual(parsed, testData[2])
 	})
 })
-suite('dpack performance tests', function(){
+suite.only('dpack performance tests', function(){
 
 	test.skip('performance msgpack-lite', function() {
 		var data = sampleData
@@ -264,15 +265,34 @@ suite('dpack performance tests', function(){
 		this.timeout(10000)
 		var data = sampleData
 		var serialized = JSON.stringify(data)
-		var serializedGzip = deflateSync(Buffer.from(serialized))
-		console.log('size', serialized.length)
-		console.log('deflate size', serializedGzip.length)
+		//var serializedGzip = deflateSync(Buffer.from(serialized))
+		console.log('JSON size', serialized.length)
+		//console.log('deflate size', serializedGzip.length)
 		var parsed
 		for (var i = 0; i < ITERATIONS; i++) {
 			parsed = JSON.parse(serialized)
 			//parsed = JSON.parse(inflateSync(serializedGzip))
 			parsed.Settings
 		}
+	})
+	test('performance JSON.parse with schema', function() {
+		this.timeout(10000)
+		var data = sampleData
+		let schema = createSchema(data)
+		//schema = internalize(schema)
+		let values = writeObjectWithSchema(data, schema)
+		var serialized = JSON.stringify(values)
+		//var serializedGzip = deflateSync(Buffer.from(serialized))
+		console.log('JSON with schema size', serialized.length)
+		//console.log('deflate size', serializedGzip.length)
+		var parsed, parsedValues
+		for (var i = 0; i < ITERATIONS; i++) {
+			parsedValues = JSON.parse(serialized)
+			parsed = readObjectWithSchema(parsedValues, schema)
+			//parsed = JSON.parse(inflateSync(serializedGzip))
+			parsed.Settings
+		}
+//		console.log({parsed})
 	})
 	test('performance shared', function() {
 		this.timeout(10000)
@@ -283,18 +303,19 @@ suite('dpack performance tests', function(){
 		serialize(sampleData, { shared: sharedGenerator })
 		//serialize(testData[2], { shared: sharedGenerator })
 		var serialized = sharedGenerator.serializeCommonStructure()
-		console.log({serialized})
 		var sharedStructure = readSharedStructure(serialized)
 		var serialized = serialize(data, { shared: sharedStructure })
 		//var serialized = serialize(data)
-		var serializedGzip = deflateSync(serialized)
-		console.log('size', serialized.length)
-		console.log('deflate size', serializedGzip.length)
+//		var serializedGzip = deflateSync(serialized)
+		console.log('dpack shared size', serialized.length)
+	//	console.log('deflate size', serializedGzip.length)
 		//console.log({ shortRefCount, longRefCount })
+		var parser = createParser({ shared: sharedStructure })
 		var parsed
 		for (var i = 0; i < ITERATIONS; i++) {
-			parsed = parse(serialized, { shared: sharedStructure })
-			//parsed = parse(inflateSync(serializedGzip))
+			parser.setSource(serialized)
+			parsed = parser.read()
+
 			parsed.Settings
 		}
 	})
@@ -302,13 +323,15 @@ suite('dpack performance tests', function(){
 		var data = sampleData
 		this.timeout(10000)
 		var serialized = serialize(data)
-		var serializedGzip = deflateSync(serialized)
-		console.log('size', serialized.length)
-		console.log('deflate size', serializedGzip.length)
+		//var serializedGzip = deflateSync(serialized)
+		console.log('dpack size', serialized.length)
+		//console.log('deflate size', serializedGzip.length)
 		//console.log({ shortRefCount, longRefCount })
+		var parser = createParser()
 		var parsed
 		for (var i = 0; i < ITERATIONS; i++) {
-			parsed = parse(serialized)
+			parser.setSource(serialized)
+			parsed = parser.read()
 			//parsed = parse(inflateSync(serializedGzip))
 			parsed.Settings
 		}
@@ -334,7 +357,7 @@ suite('dpack performance tests', function(){
 			data = type.fromBuffer(serialized);
 		}
 	})
-	test('performance V8 serialize', function() {
+	test.skip('performance V8 serialize', function() {
 		var v8 = require('v8')
 		var data = sampleData
 		this.timeout(10000)
@@ -343,7 +366,7 @@ suite('dpack performance tests', function(){
 			//var serializedGzip = deflateSync(serialized)
 		}
 	})
-	test('performance V8 deserialize', function() {
+	test.skip('performance V8 deserialize', function() {
 		var v8 = require('v8')
 		var data = sampleData
 		this.timeout(10000)
@@ -364,6 +387,15 @@ suite('dpack performance tests', function(){
 		this.timeout(10000)
 		for (var i = 0; i < ITERATIONS; i++) {
 			JSON.stringify(data)
+		}
+	})
+	test('performance JSON.stringify with schema', function() {
+		this.timeout(10000)
+		var data = sampleData
+		let schema = createSchema(data)
+		for (var i = 0; i < ITERATIONS; i++) {
+			let values = writeObjectWithSchema(data, schema)
+			JSON.stringify(values)
 		}
 	})
 
@@ -398,3 +430,86 @@ suite('dpack performance tests', function(){
 	})
 
 })
+
+
+function createSchema(object) {
+	let schema = []
+	for (let key in object)	{
+		let value = object[key]
+		let childSchema = {
+			key,
+			schema: undefined,
+		}
+		if (value && typeof value == 'object') {
+			if (value instanceof Array) {
+				if (value[0] && typeof value[0] == 'object') {
+					childSchema.schema = true
+					childSchema.items = createSchema(value[0])
+				}
+			} else {
+				childSchema.schema = true
+				childSchema.structure = createSchema(value)
+			}
+		}
+		schema.push(childSchema)
+	}
+	return schema
+}
+function writeObjectWithSchema(object, schema) {
+	let i = 0
+	let base = {}
+	let values = []
+	for (let key in object) {
+		let value = object[key]
+		let childSchema = schema[i++]
+		if (childSchema && childSchema.key == key) {
+			if (childSchema.schema) {
+				if (childSchema.items) {
+					value = writeArrayWithSchema(value, childSchema.items)
+				} else {
+					value = writeObjectWithSchema(value, childSchema.structure)
+				}
+			}
+			values.push(value)
+		} else {
+			base[key] = value
+		}
+	}
+	return values
+}
+function writeArrayWithSchema(array, schema) {
+	let l = array.length
+	let target = new Array(l)
+	for (let i = 0; i < l; i++) {
+		target[i] = writeObjectWithSchema(array[i], schema)
+	}
+	return target
+}
+function readObjectWithSchema(values, schema) {
+	let l = values.length
+	let target = {}
+	for (let i = 0; i < l;) {
+		let childSchema = schema[i]
+		let value = values[i++]
+		if (childSchema.schema && typeof value == 'object' && value) {
+			if (childSchema.items) {
+				value = readArrayWithSchema(value, childSchema.items)
+			} else if (childSchema.structure) {
+				value = readObjectWithSchema(value, childSchema.structure)
+			}
+		}
+		target[childSchema.key] = value
+	}
+	return target
+}
+function readArrayWithSchema(values, schema) {
+	let l = values.length
+	let target = new Array(l)
+	for (let i = 0; i < l; i++) {
+		target[i] = readObjectWithSchema(values[i], schema)
+	}
+	return target
+}
+function internalize(object) {
+	return eval('(' + JSON.stringify(object) +')')
+}
